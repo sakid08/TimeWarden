@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mis datos - Productivity Manager</title>
+    <style>
+      body {
+        font-family: system-ui, Arial;
+        padding: 20px;
+        max-width: 1000px;
+        margin: auto;
+        background: #f5f5f5;
+      }
+      h1 {
+        color: #333;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .warning-box {
+        background: #ffebee;
+        border-left: 4px solid #c62828;
+        padding: 14px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        color: #b71c1c;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .info-box {
+        background: #e3f2fd;
+        border-left: 4px solid #1565c0;
+        padding: 14px;
+        border-radius: 6px;
+        margin-bottom: 16px;
+        color: #0d47a1;
+        font-size: 14px;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 12px;
+        margin: 12px 0;
+      }
+      .stat {
+        background: #f9f9f9;
+        padding: 14px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .stat-num {
+        font-size: 24px;
+        font-weight: bold;
+        color: #4caf50;
+      }
+      .stat-lbl {
+        font-size: 12px;
+        color: #666;
+      }
+      pre {
+        background: #f9f9f9;
+        padding: 14px;
+        border-radius: 8px;
+        overflow: auto;
+        font-size: 12px;
+        max-height: 400px;
+      }
+      button {
+        padding: 10px 18px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 600;
+        margin: 4px;
+      }
+      .btn-primary {
+        background: #4caf50;
+        color: white;
+      }
+      .btn-danger {
+        background: #ff5252;
+        color: white;
+      }
+      .btn-secondary {
+        background: #607d8b;
+        color: white;
+      }
+      .level-badge {
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .level-light {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .level-standard {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .level-invasive {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .level-total {
+        background: #ffebee;
+        color: #c62828;
+      }
+      .tab-bar {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 12px;
+      }
+      .tab-bar button {
+        background: #eee;
+        color: #333;
+      }
+      .tab-bar button.active {
+        background: #4caf50;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🗂️ Mis datos</h1>
+
+    <div class="warning-box">
+      <strong>⚠️ Todo se guarda localmente en tu navegador</strong>. Nunca se
+      envía a ningún servidor. Cualquiera con acceso físico a tu Chrome y a la
+      extensión podría leer estos datos. Usa "Borrar todo" si necesitas eliminar
+      el historial.
+    </div>
+
+    <div class="card">
+      <h2>Configuración actual</h2>
+      <div id="level-info"></div>
+      <div class="stats-grid" id="storage-info"></div>
+    </div>
+
+    <div class="card">
+      <h2>Resumen de datos guardados</h2>
+      <div class="stats-grid" id="data-summary"></div>
+    </div>
+
+    <div class="card">
+      <h2>Vista por pestañas</h2>
+      <div class="tab-bar" id="tab-bar">
+        <button data-tab="visits" class="active">Visitas</button>
+        <button data-tab="byDomain">Por dominio</button>
+        <button data-tab="transitions">Transiciones</button>
+        <button data-tab="tabEvents">Pestañas</button>
+        <button data-tab="idle">Idle</button>
+        <button data-tab="full">JSON completo</button>
+      </div>
+      <pre id="data-view">Cargando…</pre>
+    </div>
+
+    <div class="card">
+      <h2>Acciones</h2>
+      <button class="btn-secondary" id="export-btn">💾 Exportar JSON</button>
+      <button class="btn-danger" id="purge-btn">
+        🧹 Purgar datos antiguos
+      </button>
+      <button class="btn-danger" id="delete-all-btn">
+        🗑 Borrar TODO el historial
+      </button>
+    </div>
+
+    <script src="my-data.js"></script>
+  </body>
+</html>

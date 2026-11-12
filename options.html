@@ -1,0 +1,372 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Opciones - Productivity Manager Pro</title>
+    <style>
+      body {
+        font-family: system-ui, Arial;
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+        background: #f5f5f5;
+      }
+      h1 {
+        color: #333;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .group {
+        border: 1px solid #eee;
+        padding: 15px;
+        margin-bottom: 12px;
+        border-radius: 8px;
+      }
+      .url-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 8px 0;
+      }
+      .url-tag {
+        background: #e3f2fd;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .url-tag button {
+        background: none;
+        border: none;
+        color: #d32f2f;
+        cursor: pointer;
+        font-weight: bold;
+      }
+      input,
+      button,
+      select {
+        padding: 8px 12px;
+        margin: 4px 0;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        font-size: 14px;
+      }
+      button.primary {
+        background: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button.danger {
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: #607d8b;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+      }
+      .stat {
+        background: #f9f9f9;
+        padding: 14px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .stat-num {
+        font-size: 26px;
+        font-weight: bold;
+        color: #4caf50;
+      }
+      .stat-lbl {
+        font-size: 12px;
+        color: #666;
+      }
+      .ai-rec {
+        background: #e8f5e9;
+        padding: 12px;
+        border-radius: 8px;
+        margin: 8px 0;
+      }
+      .ai-rec.warning {
+        background: #fff3e0;
+      }
+      .ai-rec.success {
+        background: #e8f5e9;
+      }
+      .ai-rec.info {
+        background: #e3f2fd;
+      }
+      .ai-rec strong {
+        color: #333;
+      }
+      .schedule-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+      .toggle {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>⚙️ Productivity Manager Pro</h1>
+
+    <!-- Estadísticas -->
+    <div class="card">
+      <h2>📊 Estadísticas</h2>
+      <div class="stats-grid" id="stats-grid"></div>
+    </div>
+
+    <!-- IA -->
+    <div class="card">
+      <h2>🤖 Recomendaciones IA</h2>
+      <div id="ai-recommendations"></div>
+    </div>
+
+    <!-- Grupos -->
+    <div class="card">
+      <h2>📁 Grupos</h2>
+      <div id="groups-container"></div>
+      <div class="row" style="margin-top: 12px">
+        <input
+          type="text"
+          id="new-group-name"
+          placeholder="Nombre del grupo"
+          style="flex: 1"
+        />
+        <input
+          type="text"
+          id="new-group-url"
+          placeholder="URL (ej: facebook.com)"
+          style="flex: 1"
+        />
+        <button class="primary" id="add-group-btn">Añadir grupo</button>
+      </div>
+    </div>
+
+    <!-- Configuración -->
+    <div class="card">
+      <h2>⚙️ Configuración</h2>
+      <div class="row">
+        <label
+          >Sesión por defecto (min):
+          <input type="number" id="cfg-session" min="1" style="width: 80px"
+        /></label>
+        <label
+          >Descanso por defecto (min):
+          <input type="number" id="cfg-break" min="1" style="width: 80px"
+        /></label>
+        <label
+          >Aviso previo (min):
+          <input type="number" id="cfg-warning" min="1" style="width: 80px"
+        /></label>
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <label
+          >Tema:
+          <select id="cfg-theme">
+            <option value="light">Claro</option>
+            <option value="dark">Oscuro</option>
+            <option value="auto">Automático</option>
+          </select>
+        </label>
+        <label
+          ><input type="checkbox" id="cfg-notifications" />
+          Notificaciones</label
+        >
+        <label><input type="checkbox" id="cfg-sounds" /> Sonidos</label>
+        <label
+          ><input type="checkbox" id="cfg-strict" /> Modo estricto global</label
+        >
+        <label><input type="checkbox" id="cfg-ai" /> IA activada</label>
+      </div>
+      <div style="margin-top: 10px">
+        <label>Frase de bypass:</label>
+        <input type="text" id="cfg-bypass-phrase" style="width: 100%" />
+      </div>
+      <button class="primary" id="save-settings-btn" style="margin-top: 10px">
+        Guardar configuración
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>⚡ Análisis y Energía</h2>
+      <div class="row">
+        <label
+          >Nivel de análisis:
+          <select id="cfg-analysis-level">
+            <option value="light">🟢 Ligero (solo grupos)</option>
+            <option value="standard">🔵 Estándar (foco + pestañas)</option>
+            <option value="invasive">🟠 Invasivo (detalle + cadenas)</option>
+            <option value="total">🔴 Total (todas las URLs, opt-in)</option>
+          </select>
+        </label>
+      </div>
+      <div class="row" style="margin-top: 10px">
+        <label
+          >Retención Ligero:
+          <input type="number" id="cfg-ret-light" min="1" style="width: 70px" />
+          días</label
+        >
+        <label
+          >Estándar:
+          <input
+            type="number"
+            id="cfg-ret-standard"
+            min="1"
+            style="width: 70px"
+          />
+          días</label
+        >
+        <label
+          >Invasivo:
+          <input
+            type="number"
+            id="cfg-ret-invasive"
+            min="1"
+            style="width: 70px"
+          />
+          días</label
+        >
+        <label
+          >Total:
+          <input
+            type="number"
+            id="cfg-ret-total"
+            min="1"
+            max="30"
+            style="width: 70px"
+          />
+          días</label
+        >
+      </div>
+      <p style="font-size: 12px; color: #666; margin-top: 10px">
+        El modo Total registra todas tus URLs (con filtros de bancos, email,
+        salud, gobierno, tokens). Solo se activa desde el popup con confirmación
+        escrita.
+      </p>
+      <button class="primary" id="save-analysis-btn" style="margin-top: 10px">
+        Guardar análisis
+      </button>
+      <button class="danger" id="purge-now-btn" style="margin-top: 10px">
+        🧹 Purgar ahora
+      </button>
+    </div>
+
+    <!-- Horarios -->
+    <div class="card">
+      <h2>🕐 Horario de productividad</h2>
+      <div class="toggle">
+        <label
+          ><input type="checkbox" id="cfg-schedule-enabled" /> Activar
+          horario</label
+        >
+      </div>
+      <div class="schedule-row">
+        <label
+          >Desde: <input type="time" id="cfg-hour-start" value="09:00"
+        /></label>
+        <label
+          >Hasta: <input type="time" id="cfg-hour-end" value="18:00"
+        /></label>
+      </div>
+      <div style="margin-top: 10px">
+        <label>Días activos:</label><br />
+        <label><input type="checkbox" class="day" value="1" /> Lun</label>
+        <label><input type="checkbox" class="day" value="2" /> Mar</label>
+        <label><input type="checkbox" class="day" value="3" /> Mié</label>
+        <label><input type="checkbox" class="day" value="4" /> Jue</label>
+        <label><input type="checkbox" class="day" value="5" /> Vie</label>
+        <label><input type="checkbox" class="day" value="6" /> Sáb</label>
+        <label><input type="checkbox" class="day" value="0" /> Dom</label>
+      </div>
+      <button class="primary" id="save-schedule-btn" style="margin-top: 10px">
+        Guardar horario
+      </button>
+    </div>
+
+    <!-- Whitelist -->
+    <div class="card">
+      <h2>✅ Lista blanca (URLs nunca bloqueadas)</h2>
+      <div id="whitelist-container"></div>
+      <div class="row">
+        <input
+          type="text"
+          id="new-whitelist"
+          placeholder="ej: localhost"
+          style="flex: 1"
+        />
+        <button class="primary" id="add-whitelist-btn">Añadir</button>
+      </div>
+    </div>
+
+    <!-- Pomodoro -->
+    <div class="card">
+      <h2>🍅 Pomodoro</h2>
+      <div class="row">
+        <label
+          >Sesión (min):
+          <input type="number" id="cfg-pomo-session" style="width: 80px"
+        /></label>
+        <label
+          >Descanso corto:
+          <input type="number" id="cfg-pomo-short" style="width: 80px"
+        /></label>
+        <label
+          >Descanso largo:
+          <input type="number" id="cfg-pomo-long" style="width: 80px"
+        /></label>
+        <label
+          >Sesiones hasta descanso largo:
+          <input type="number" id="cfg-pomo-count" style="width: 80px"
+        /></label>
+      </div>
+      <button class="primary" id="save-pomodoro-btn" style="margin-top: 10px">
+        Guardar Pomodoro
+      </button>
+    </div>
+
+    <!-- Backup -->
+    <div class="card">
+      <h2>💾 Backup</h2>
+      <button class="secondary" id="export-btn">Exportar datos</button>
+      <input
+        type="file"
+        id="import-input"
+        accept=".json"
+        style="display: none"
+      />
+      <button class="secondary" id="import-btn">Importar datos</button>
+      <button class="danger" id="reset-all-btn" style="margin-left: 10px">
+        Reiniciar todo
+      </button>
+    </div>
+
+    <script src="options.js"></script>
+  </body>
+</html>

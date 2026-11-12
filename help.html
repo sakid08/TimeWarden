@@ -1,0 +1,968 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Ayuda - TimeWarden</title>
+    <style>
+      body {
+        font-family: system-ui, Arial;
+        padding: 20px;
+        max-width: 900px;
+        margin: auto;
+        line-height: 1.6;
+        background: #f5f5f5;
+        color: #222;
+      }
+      h1 {
+        color: #333;
+      }
+      h2 {
+        color: #333;
+        margin-top: 32px;
+        border-bottom: 2px solid #4caf50;
+        padding-bottom: 6px;
+      }
+      h3 {
+        color: #444;
+        margin-top: 20px;
+      }
+      .step {
+        margin: 14px 0;
+        padding: 16px;
+        background: white;
+        border-left: 4px solid #4caf50;
+        border-radius: 6px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      .step h3 {
+        margin-top: 0;
+      }
+      .mode-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin: 10px 0;
+      }
+      .mode-card {
+        padding: 12px;
+        border-radius: 8px;
+        text-align: center;
+        border: 1px solid #eee;
+        background: white;
+      }
+      .mode-card .icon {
+        font-size: 28px;
+      }
+      .mode-card small {
+        color: #666;
+      }
+      .level-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin: 12px 0;
+      }
+      .level-card {
+        padding: 16px;
+        border-radius: 10px;
+        background: white;
+        border: 2px solid #eee;
+      }
+      .level-card h4 {
+        margin: 0 0 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .level-card ul {
+        margin: 8px 0 0 20px;
+        padding: 0;
+        font-size: 13px;
+        color: #555;
+      }
+      .level-light {
+        border-color: #4caf50;
+      }
+      .level-standard {
+        border-color: #2196f3;
+      }
+      .level-invasive {
+        border-color: #ff9800;
+      }
+      .level-total {
+        border-color: #c62828;
+      }
+      .warning {
+        background: #ffebee;
+        border-left: 4px solid #c62828;
+        padding: 14px;
+        border-radius: 6px;
+        margin: 14px 0;
+        color: #b71c1c;
+      }
+      .info {
+        background: #e3f2fd;
+        border-left: 4px solid #1565c0;
+        padding: 14px;
+        border-radius: 6px;
+        margin: 14px 0;
+        color: #0d47a1;
+      }
+      .success {
+        background: #e8f5e9;
+        border-left: 4px solid #2e7d32;
+        padding: 14px;
+        border-radius: 6px;
+        margin: 14px 0;
+        color: #1b5e20;
+      }
+      .faq-q {
+        font-weight: bold;
+        color: #4caf50;
+        margin-top: 16px;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        margin: 12px 0;
+        background: white;
+        font-size: 13px;
+      }
+      th,
+      td {
+        padding: 8px 10px;
+        border: 1px solid #e0e0e0;
+        text-align: left;
+      }
+      th {
+        background: #f5f5f5;
+      }
+      code {
+        background: #f0f0f0;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+      }
+      .toc {
+        background: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      .toc ul {
+        margin: 8px 0;
+        padding-left: 20px;
+      }
+      .toc a {
+        color: #4caf50;
+        text-decoration: none;
+      }
+      .toc a:hover {
+        text-decoration: underline;
+      }
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .badge-light {
+        background: #e8f5e9;
+        color: #2e7d32;
+      }
+      .badge-standard {
+        background: #e3f2fd;
+        color: #1565c0;
+      }
+      .badge-invasive {
+        background: #fff3e0;
+        color: #e65100;
+      }
+      .badge-total {
+        background: #ffebee;
+        color: #c62828;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📖 Guía de uso — TimeWarden</h1>
+
+    <div class="toc">
+      <strong>Contenido</strong>
+      <ul>
+        <li><a href="#primeros-pasos">Primeros pasos</a></li>
+        <li><a href="#popup">El popup (3 secciones)</a></li>
+        <li><a href="#modos">Modos de productividad</a></li>
+        <li>
+          <a href="#niveles"
+            >Niveles de análisis (Ligero / Estándar / Invasivo / Total)</a
+          >
+        </li>
+        <li><a href="#total">⚠️ Modo Total (panóptico)</a></li>
+        <li><a href="#energia">⚡ Energía y rendimiento</a></li>
+        <li><a href="#ia">🤖 Cómo funciona la IA local</a></li>
+        <li><a href="#misdatos">🗂️ Página "Mis datos"</a></li>
+        <li><a href="#pomodoro">🍅 Pomodoro</a></li>
+        <li><a href="#privacidad">🔒 Privacidad y seguridad</a></li>
+        <li><a href="#faq">❓ Preguntas frecuentes</a></li>
+      </ul>
+    </div>
+
+    <h2 id="primeros-pasos">1. Primeros pasos</h2>
+
+    <div class="step">
+      <h3>Configura grupos</h3>
+      <p>
+        Ve a <strong>Opciones</strong> → crea grupos con las URLs que quieres
+        controlar. Ejemplo: "Redes Sociales" con <code>facebook.com</code>,
+        <code>twitter.com</code>, <code>instagram.com</code>.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Elige un modo</h3>
+      <p>
+        Usa el popup para elegir un modo: Trabajo, Chill, Enfoque, Estudio o
+        Personalizado. Cada modo ajusta las duraciones por defecto y el nivel de
+        strictness.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Inicia una sesión</h3>
+      <p>
+        Navega a una URL de un grupo. Aparecerá un overlay para configurar
+        sesión y descanso. También puedes iniciar desde el popup.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Durante la sesión</h3>
+      <p>
+        El badge del ícono muestra los minutos restantes. Recibirás un aviso y
+        notificación antes de terminar.
+      </p>
+    </div>
+
+    <div class="step">
+      <h3>Descanso</h3>
+      <p>
+        Al terminar la sesión, todas las pestañas del grupo se bloquean. Verás
+        un temporizador en vivo y actividades sugeridas.
+      </p>
+    </div>
+
+    <h2 id="popup">2. El popup (3 secciones)</h2>
+
+    <p>Al hacer clic en el ícono de la extensión verás 3 secciones:</p>
+
+    <div class="step">
+      <h3>🍅 Pomodoro / Sesión</h3>
+      <ul>
+        <li>Selector de modo (💼 🌴 🎯 📚 ⚙️)</li>
+        <li>Timer en vivo</li>
+        <li>Duración de sesión y descanso (editable)</li>
+        <li>Botón <strong>▶ Iniciar</strong> y <strong>🍅 Pomodoro</strong></li>
+        <li>Racha de días y tip de IA</li>
+        <li>Botón <strong>⏹ Detener sesión</strong> si hay una activa</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h3>🚫 Esta página</h3>
+      <ul>
+        <li>Muestra el favicon, título y URL de la pestaña activa</li>
+        <li>
+          Estado: <span class="badge badge-light">Permitida</span> /
+          <span class="badge badge-total">Bloqueada</span> / Sin regla
+        </li>
+        <li>
+          <strong>🚫 Bloquear ahora</strong>: añade la URL al grupo "Bloqueadas"
+        </li>
+        <li>
+          <strong>✅ Permitir siempre</strong>: añade la URL a la whitelist y la
+          quita de grupos
+        </li>
+        <li>Lista de grupos con un clic para añadir/quitar la URL</li>
+        <li>Crear grupo nuevo y añadir la URL actual al instante</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <h3>🔗 Acciones</h3>
+      <ul>
+        <li>Estadísticas rápidas (sesiones, respetados, bypass)</li>
+        <li>
+          Botones: <strong>📊 Dashboard</strong>, <strong>🗂 Mis datos</strong>,
+          <strong>⚙️ Configuración</strong>, <strong>📖 Ayuda</strong>
+        </li>
+      </ul>
+    </div>
+
+    <p>
+      Además, entre la sección 2 y 3 hay una sección de
+      <strong>👁 Análisis</strong> con:
+    </p>
+    <ul>
+      <li>Selector de nivel de análisis</li>
+      <li>Botón <strong>⏸ Pausar 1h</strong> / <strong>▶ Reanudar</strong></li>
+    </ul>
+
+    <h2 id="modos">3. Modos de productividad</h2>
+
+    <div class="mode-grid">
+      <div class="mode-card">
+        <div class="icon">💼</div>
+        <strong>Trabajo</strong><br /><small>50/10 · Estricto</small>
+      </div>
+      <div class="mode-card">
+        <div class="icon">🌴</div>
+        <strong>Chill</strong><br /><small>20/10 · Flexible</small>
+      </div>
+      <div class="mode-card">
+        <div class="icon">🎯</div>
+        <strong>Enfoque</strong><br /><small>90/20 · Estricto</small>
+      </div>
+      <div class="mode-card">
+        <div class="icon">📚</div>
+        <strong>Estudio</strong><br /><small>45/15 · Estricto</small>
+      </div>
+      <div class="mode-card">
+        <div class="icon">⚙️</div>
+        <strong>Custom</strong><br /><small>Tú decides</small>
+      </div>
+    </div>
+
+    <p>
+      Los modos <strong>estrictos</strong> (Trabajo, Enfoque, Estudio)
+      <strong>desactivan el bypass de emergencia</strong>. Solo Chill y Custom
+      permiten bypass.
+    </p>
+
+    <h2 id="niveles">4. Niveles de análisis</h2>
+
+    <p>
+      La extensión puede recopilar datos en 4 niveles, de menos a más invasivo.
+      Todos son <strong>100% locales</strong>.
+    </p>
+
+    <div class="level-grid">
+      <div class="level-card level-light">
+        <h4><span class="badge badge-light">🟢 Ligero</span></h4>
+        <p><strong>Por defecto.</strong> Solo registra lo esencial:</p>
+        <ul>
+          <li>Sesiones, descansos, bypass</li>
+          <li>Visitas a URLs de tus grupos</li>
+          <li>Estadísticas diarias y rachas</li>
+          <li>Retención: 30 días</li>
+        </ul>
+        <p><small>Consumo: ~0.3%/hora activo</small></p>
+      </div>
+
+      <div class="level-card level-standard">
+        <h4><span class="badge badge-standard">🔵 Estándar</span></h4>
+        <p>Añade contexto de uso:</p>
+        <ul>
+          <li>Todo lo de Ligero</li>
+          <li>Tiempo de foco real (visibilidad + idle)</li>
+          <li>Apertura/cierre de pestañas de grupos</li>
+          <li>Cambios de pestaña y heatmap hora × día</li>
+          <li>Retención: 30 días</li>
+        </ul>
+        <p><small>Consumo: ~0.8%/hora activo</small></p>
+      </div>
+
+      <div class="level-card level-invasive">
+        <h4><span class="badge badge-invasive">🟠 Invasivo</span></h4>
+        <p>Detecta patrones de distracción:</p>
+        <ul>
+          <li>Todo lo de Estándar</li>
+          <li>Cadenas de distracción (ej: FB→IG→Twitter en &lt;3 min)</li>
+          <li>Reaperturas rápidas de URLs</li>
+          <li>Patrones de bypass (minutos en sesión antes de bypass)</li>
+          <li>Resistencia (tiempo sin sesión en páginas de grupo)</li>
+          <li>Retención: 30 días</li>
+        </ul>
+        <p><small>Consumo: ~1.5%/hora activo</small></p>
+      </div>
+
+      <div class="level-card level-total">
+        <h4><span class="badge badge-total">🔴 Total</span></h4>
+        <p>
+          <strong>Opt-in con confirmación escrita.</strong> Registra
+          <strong>todas</strong> tus URLs (con filtros):
+        </p>
+        <ul>
+          <li>Todo lo de Invasivo</li>
+          <li>Visitas a cualquier dominio</li>
+          <li>
+            Score de vida digital (enfoque/disciplina/diversidad/distracción)
+          </li>
+          <li>Predicción de próxima distracción</li>
+          <li>Retención: 7 días por defecto</li>
+        </ul>
+        <p><small>Consumo: ~2-3%/hora activo</small></p>
+      </div>
+    </div>
+
+    <div class="warning">
+      <strong>⚠️ Cambiar de nivel</strong>
+      <p>
+        Puedes cambiar de nivel desde el popup o desde Opciones. Al bajar de
+        nivel, los datos ya recopilados se mantienen hasta que sean purgados por
+        retención. Para borrarlos ya, usa
+        <strong>Mis datos → 🗑 Borrar TODO el historial</strong>.
+      </p>
+    </div>
+
+    <h2 id="total">5. ⚠️ Modo Total (panóptico)</h2>
+
+    <div class="warning">
+      <strong>Este modo es el más invasivo. Léelo antes de activarlo.</strong>
+      <p>
+        El modo Total registra <strong>todas</strong> las URLs que visitas (no
+        solo las de tus grupos). Aunque se guarda solo localmente y se filtran
+        sitios sensibles, cualquiera con acceso a tu Chrome podría leer estos
+        datos. Úsalo solo si entiendes y aceptas el riesgo.
+      </p>
+    </div>
+
+    <h3>Cómo activarlo</h3>
+    <ol>
+      <li>Abre el popup</li>
+      <li>En la sección 👁 Análisis, selecciona <strong>🔴 Total</strong></li>
+      <li>Escribe exactamente: <code>ENTIENDO LOS RIESGOS</code></li>
+      <li>Elige cuántos días quieres que esté activo (vacío = indefinido)</li>
+    </ol>
+
+    <h3>Qué hace el modo Total</h3>
+    <table>
+      <tr>
+        <th>Recopila</th>
+        <th>NO recopila nunca</th>
+      </tr>
+      <tr>
+        <td>
+          ✅ URLs visitadas (dominio + path)<br />
+          ✅ Tiempo de foco real<br />
+          ✅ Apertura/cierre de pestañas<br />
+          ✅ Cambios de pestaña<br />
+          ✅ Estado idle del sistema<br />
+          ✅ Cadenas de distracción<br />
+          ✅ Predicciones de próxima distracción
+        </td>
+        <td>
+          ❌ Contenido de páginas<br />
+          ❌ Texto escrito en formularios<br />
+          ❌ Contraseñas<br />
+          ❌ Query params (tokens, sesiones)<br />
+          ❌ Bancos, email, salud, gobierno<br />
+          ❌ Documentos personales (Docs, Drive, Dropbox)<br />
+          ❌ Mensajes directos (FB, IG, WhatsApp, Telegram)<br />
+          ❌ URLs fuera de tu navegador
+        </td>
+      </tr>
+    </table>
+
+    <h3>Filtros automáticos (siempre activos)</h3>
+    <p>
+      Incluso en modo Total, estas URLs se descartan
+      <strong>completamente</strong> (ni siquiera el dominio se guarda):
+    </p>
+    <ul>
+      <li>
+        Bancos: <code>bbva</code>, <code>santander</code>, <code>hsbc</code>,
+        <code>paypal</code>, <code>stripe</code>, <code>binance</code>…
+      </li>
+      <li>
+        Email: <code>mail.google</code>, <code>outlook</code>,
+        <code>protonmail</code>…
+      </li>
+      <li>
+        Salud: <code>imss</code>, <code>issste</code>, <code>hospital</code>…
+      </li>
+      <li>
+        Gobierno: <code>gob.</code>, <code>gov.</code>, <code>sat.gob</code>…
+      </li>
+      <li>
+        Auth: <code>login</code>, <code>signin</code>, <code>oauth</code>,
+        <code>password</code>…
+      </li>
+      <li>
+        Tokens en URL: <code>?token=</code>, <code>?key=</code>,
+        <code>?secret=</code>…
+      </li>
+      <li>
+        Documentos: <code>docs.google.com/d</code>, <code>drive.google</code>,
+        <code>dropbox</code>…
+      </li>
+      <li>
+        Mensajes: <code>facebook.com/messages</code>,
+        <code>instagram.com/direct</code>, <code>whatsapp</code>…
+      </li>
+    </ul>
+
+    <h3>Cómo desactivarlo</h3>
+    <ul>
+      <li>Cambia el nivel en el popup (a Ligero, Estándar o Invasivo)</li>
+      <li>
+        O espera a que expire automáticamente si pusiste un límite de días
+      </li>
+      <li>O ve a <strong>Mis datos → 🗑 Borrar TODO el historial</strong></li>
+    </ul>
+
+    <h2 id="energia">6. ⚡ Energía y rendimiento</h2>
+
+    <p>
+      La extensión está optimizada para no consumir batería. Estas técnicas se
+      aplican automáticamente:
+    </p>
+
+    <table>
+      <tr>
+        <th>Técnica</th>
+        <th>Qué hace</th>
+      </tr>
+      <tr>
+        <td><strong>Batching</strong></td>
+        <td>
+          Agrupa escrituras cada 15s o 20 eventos, no escribe en cada acción.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>Throttle por dominio</strong></td>
+        <td>No registra la misma URL más de 1 vez cada 5 min.</td>
+      </tr>
+      <tr>
+        <td><strong>Pausa en idle</strong></td>
+        <td>Si el sistema está inactivo, deja de registrar.</td>
+      </tr>
+      <tr>
+        <td><strong>Listeners dinámicos</strong></td>
+        <td>En modo Ligero, no escucha eventos de pestañas.</td>
+      </tr>
+      <tr>
+        <td><strong>Sin setInterval</strong></td>
+        <td>El service worker duerme cuando no hay sesión activa.</td>
+      </tr>
+      <tr>
+        <td><strong>Debounce en content</strong></td>
+        <td>La visibilidad de pestaña se reporta con 200ms de debounce.</td>
+      </tr>
+      <tr>
+        <td><strong>Compactación</strong></td>
+        <td>Las visitas de hace +2 días se agregan por dominio.</td>
+      </tr>
+      <tr>
+        <td><strong>Purga automática</strong></td>
+        <td>Cada 6h borra datos más antiguos que la retención.</td>
+      </tr>
+    </table>
+
+    <h3>Pausa manual</h3>
+    <p>En el popup, sección 👁 Análisis:</p>
+    <ul>
+      <li>
+        <strong>⏸ Pausar 1h</strong>: deja de registrar durante 1 hora. El badge
+        muestra ⏸.
+      </li>
+      <li>
+        <strong>▶ Reanudar</strong>: vuelve a activar el análisis antes de que
+        termine la hora.
+      </li>
+    </ul>
+
+    <p>
+      Útil si vas a hacer algo privado (banca, salud) y no quieres ni que se
+      registre.
+    </p>
+
+    <h3>Qué significa el badge del ícono</h3>
+    <table>
+      <tr>
+        <th>Badge</th>
+        <th>Significado</th>
+      </tr>
+      <tr>
+        <td><code>25m</code> verde</td>
+        <td>Sesión activa, quedan 25 minutos</td>
+      </tr>
+      <tr>
+        <td><code>5m</code> rojo</td>
+        <td>Descanso activo, quedan 5 minutos</td>
+      </tr>
+      <tr>
+        <td><code>BY</code> naranja</td>
+        <td>Bypass usado, desbloqueado por 5 min</td>
+      </tr>
+      <tr>
+        <td><code>⏸</code> gris</td>
+        <td>Análisis pausado manualmente</td>
+      </tr>
+      <tr>
+        <td><code>👁</code> gris</td>
+        <td>Nivel Estándar o Invasivo activo</td>
+      </tr>
+      <tr>
+        <td><code>👁</code> rojo</td>
+        <td>Modo Total activo</td>
+      </tr>
+      <tr>
+        <td>(vacío)</td>
+        <td>Sin sesión y nivel Ligero</td>
+      </tr>
+    </table>
+
+    <h2 id="ia">7. 🤖 Cómo funciona la IA local</h2>
+
+    <div class="info">
+      <strong>Todo se procesa en tu navegador.</strong> La IA no usa ningún
+      servicio externo, no envía datos a ningún servidor, y no requiere
+      internet.
+    </div>
+
+    <p>
+      La IA es un motor de reglas que analiza tus estadísticas y datos
+      recopilados (según el nivel activo). Se ejecuta:
+    </p>
+    <ul>
+      <li>Al terminar un descanso</li>
+      <li>Cuando pulsas "Sugerir duración con IA" en el overlay de sesión</li>
+      <li>Al abrir el popup o el dashboard (solo lee, no recalcula)</li>
+    </ul>
+
+    <h3>Qué detecta según el nivel</h3>
+
+    <table>
+      <tr>
+        <th>Nivel</th>
+        <th>Recomendaciones que puede dar</th>
+      </tr>
+      <tr>
+        <td><span class="badge badge-light">Ligero</span></td>
+        <td>Hora más productiva, ratio de bypass, racha de días</td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-standard">Estándar</span></td>
+        <td>
+          + Total de foco real, hora de mayor distracción, pestañas abiertas,
+          tiempo idle
+        </td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-invasive">Invasivo</span></td>
+        <td>
+          + Cadenas de distracción detectadas, reaperturas rápidas, bypass tras
+          fatiga (minutos en sesión)
+        </td>
+      </tr>
+      <tr>
+        <td><span class="badge badge-total">Total</span></td>
+        <td>
+          + Top dominios por tiempo, score de vida digital, predicción de
+          próxima distracción
+        </td>
+      </tr>
+    </table>
+
+    <h3>Score de vida digital (solo modo Total)</h3>
+    <p>Se calcula con 4 métricas (0-10 cada una):</p>
+    <ul>
+      <li>
+        <strong>Enfoque</strong>: proporción de visitas largas vs cambios de
+        pestaña
+      </li>
+      <li>
+        <strong>Disciplina</strong>: descansos respetados / total de descansos
+      </li>
+      <li>
+        <strong>Diversidad</strong>: cantidad de dominios únicos (más diversidad
+        = mejor)
+      </li>
+      <li>
+        <strong>Distracción</strong>: bypass en los últimos 7 días (más bypass =
+        peor)
+      </li>
+    </ul>
+
+    <h3>Predicción de próxima distracción (solo modo Total)</h3>
+    <p>
+      Basado en tus visitas recientes y la hora actual, predice qué dominio es
+      más probable que abras en los próximos 15 minutos, con un porcentaje de
+      confianza.
+    </p>
+
+    <h3>Desactivar la IA</h3>
+    <p>
+      En Opciones → Configuración → desmarca "IA activada". Los datos se siguen
+      recopilando según el nivel, pero no se generan recomendaciones.
+    </p>
+
+    <h2 id="misdatos">8. 🗂️ Página "Mis datos"</h2>
+
+    <p>
+      Accesible desde el popup (botón <strong>🗂 Mis datos</strong>). Está
+      diseñada para que veas <strong>exactamente</strong> qué se está guardando
+      de ti.
+    </p>
+
+    <h3>Qué muestra</h3>
+    <ul>
+      <li>
+        <strong>Configuración actual</strong>: nivel de análisis, retención, si
+        el modo Total está activo, si está pausado
+      </li>
+      <li>
+        <strong>Almacenamiento usado</strong>: KB y porcentaje de la cuota de 10
+        MB
+      </li>
+      <li>
+        <strong>Resumen</strong>: cuántas visitas, dominios, transiciones,
+        eventos de pestaña, idle, cadenas, reaperturas
+      </li>
+      <li>
+        <strong>Vista por pestañas</strong>: Visitas / Por dominio /
+        Transiciones / Pestañas / Idle / JSON completo
+      </li>
+    </ul>
+
+    <h3>Acciones</h3>
+    <ul>
+      <li>
+        <strong>💾 Exportar JSON</strong>: descarga todo lo guardado para que lo
+        inspecciones
+      </li>
+      <li>
+        <strong>🧹 Purgar datos antiguos</strong>: borra lo que exceda la
+        retención configurada
+      </li>
+      <li>
+        <strong>🗑 Borrar TODO el historial</strong>: borra visitas,
+        transiciones, eventos, bypass, historial de sesiones (mantiene grupos y
+        configuración)
+      </li>
+    </ul>
+
+    <div class="success">
+      <strong>Transparencia total.</strong> Si alguna vez dudas de qué sabe la
+      extensión de ti, abre esta página. Todo está en el JSON, sin filtros ni
+      ocultamientos.
+    </div>
+
+    <h2 id="pomodoro">9. 🍅 Pomodoro</h2>
+
+    <p>La extensión incluye un modo Pomodoro configurable:</p>
+
+    <table>
+      <tr>
+        <th>Parámetro</th>
+        <th>Default</th>
+      </tr>
+      <tr>
+        <td>Duración de sesión</td>
+        <td>25 min</td>
+      </tr>
+      <tr>
+        <td>Descanso corto</td>
+        <td>5 min</td>
+      </tr>
+      <tr>
+        <td>Descanso largo</td>
+        <td>15 min</td>
+      </tr>
+      <tr>
+        <td>Sesiones hasta descanso largo</td>
+        <td>4</td>
+      </tr>
+    </table>
+
+    <p>
+      Puedes iniciar un Pomodoro desde el popup con el botón
+      <strong>🍅 Pomodoro</strong>. Al completar el ciclo de sesiones, recibirás
+      un descanso largo automáticamente.
+    </p>
+
+    <p>Configúralo en Opciones → Pomodoro.</p>
+
+    <h2 id="privacidad">10. 🔒 Privacidad y seguridad</h2>
+
+    <div class="success">
+      <strong>100% local.</strong> La extensión no envía datos a ningún
+      servidor. No requiere internet. No tiene backend.
+    </div>
+
+    <h3>Dónde se guardan tus datos</h3>
+    <ul>
+      <li>En <code>chrome.storage.local</code> de tu perfil de Chrome</li>
+      <li>
+        Nunca en <code>chrome.storage.sync</code> (no se sincroniza entre
+        dispositivos)
+      </li>
+      <li>Nunca se envían por red</li>
+      <li>Nunca accede a archivos fuera del navegador</li>
+    </ul>
+
+    <h3>Qué NO hace la extensión</h3>
+    <ul>
+      <li>❌ No lee el contenido de las páginas</li>
+      <li>❌ No lee formularios ni contraseñas</li>
+      <li>
+        ❌ No accede a tu historial completo de Chrome (solo a las URLs que
+        navegas mientras está activa)
+      </li>
+      <li>❌ No usa VPN, proxy, ni servicios externos</li>
+      <li>❌ No hace reconocimiento facial ni biometría</li>
+      <li>❌ No se sincroniza entre dispositivos</li>
+    </ul>
+
+    <h3>Buenas prácticas</h3>
+    <ul>
+      <li>
+        Si compartes tu computadora, activa el nivel Ligero o pausa el análisis
+        antes de dejarla
+      </li>
+      <li>
+        Si sospechas que alguien más usará tu Chrome, borra el historial desde
+        Mis datos
+      </li>
+      <li>Exporta tu configuración periódicamente como backup</li>
+      <li>No actives el modo Total en dispositivos compartidos</li>
+    </ul>
+
+    <h2 id="faq">11. ❓ Preguntas frecuentes</h2>
+
+    <div class="faq-q">¿Qué es el modo estricto?</div>
+    <p>
+      Un modo donde el bypass está deshabilitado. Los modos Trabajo, Enfoque y
+      Estudio son estrictos por defecto. Ideal para bloquear distracciones
+      seriamente.
+    </p>
+
+    <div class="faq-q">¿Cómo funciona el bypass de emergencia?</div>
+    <p>
+      Escribe la frase exacta en el campo de texto durante el descanso. Solo
+      disponible en modos flexibles (Chill, Custom). Si fallas la frase, no se
+      desbloquea. Si la usas, queda registrado en estadísticas y rompe tu racha.
+    </p>
+
+    <div class="faq-q">¿Qué pasa si cierro el navegador?</div>
+    <p>
+      Los temporizadores continúan usando <code>chrome.alarms</code>. Al volver
+      a abrir, el estado se mantiene. Los datos de análisis se conservan en
+      <code>chrome.storage.local</code>.
+    </p>
+
+    <div class="faq-q">¿La IA realmente aprende de mí?</div>
+    <p>
+      Sí, pero de forma basada en reglas. No es un modelo de machine learning
+      pesado: analiza tus datos (historial de sesiones, visitas, patrones de
+      pestañas) y aplica reglas estadísticas. Todo local y explicable.
+    </p>
+
+    <div class="faq-q">¿Cuándo se ejecuta la IA?</div>
+    <p>
+      Solo al terminar un descanso, cuando pulsas "Sugerir duración" en el
+      overlay, o cuando abres el popup (solo lee, no recalcula). No analiza
+      continuamente en segundo plano.
+    </p>
+
+    <div class="faq-q">¿Puedo exportar mis datos?</div>
+    <p>
+      Sí. En Opciones → Backup, o en Mis datos → 💾 Exportar JSON. Se descarga
+      un archivo JSON con todo lo guardado.
+    </p>
+
+    <div class="faq-q">
+      ¿Puedo borrar el historial sin perder mi configuración?
+    </div>
+    <p>
+      Sí. En Mis datos → 🗑 Borrar TODO el historial. Se borran visitas,
+      transiciones, eventos e historial de sesiones, pero se mantienen grupos,
+      modos y configuración.
+    </p>
+
+    <div class="faq-q">
+      ¿Qué diferencia hay entre los 4 niveles de análisis?
+    </div>
+    <p>
+      Ligero: solo lo esencial (grupos). Estándar: añade foco real, pestañas e
+      idle. Invasivo: añade cadenas de distracción y patrones de bypass. Total:
+      registra todas las URLs con filtros de sensibles (opt-in con confirmación
+      escrita).
+    </p>
+
+    <div class="faq-q">¿El modo Total es peligroso?</div>
+    <p>
+      Es el más invasivo. Registra todas tus URLs (excepto bancos, email, salud,
+      gobierno, tokens, documentos y mensajes). Aunque se guarda localmente,
+      cualquiera con acceso a tu Chrome podría leerlo. Úsalo solo si entiendes y
+      aceptas el riesgo, y en dispositivos personales.
+    </p>
+
+    <div class="faq-q">¿La extensión consume batería?</div>
+    <p>
+      Está optimizada: batching de escrituras, throttle por dominio, pausa
+      automática en idle, debounce de visibilidad, listeners según nivel, sin
+      <code>setInterval</code> en background. Consumo estimado: 0.3%/hora
+      (Ligero) a 2-3%/hora (Total).
+    </p>
+
+    <div class="faq-q">¿Qué significa el badge 👁 del ícono?</div>
+    <p>
+      Indica que el análisis está activo en un nivel superior a Ligero. Gris =
+      Estándar/Invasivo. Rojo = Total. Si está vacío, no hay sesión ni análisis
+      avanzado activo.
+    </p>
+
+    <div class="faq-q">¿Puedo pausar el análisis temporalmente?</div>
+    <p>
+      Sí. En el popup, sección 👁 Análisis, botón ⏸ Pausar 1h. Útil si vas a
+      hacer algo privado (banca, salud) sin querer que se registre.
+    </p>
+
+    <div class="faq-q">
+      ¿Qué pasa si tengo una sesión activa y abro otra pestaña del mismo grupo?
+    </div>
+    <p>
+      La sesión es por grupo, no por pestaña. Todas las pestañas del grupo
+      comparten la misma sesión. Al terminar, todas se bloquean simultáneamente.
+    </p>
+
+    <div class="faq-q">¿Puedo tener múltiples sesiones activas a la vez?</div>
+    <p>
+      No. Solo puede haber una sesión activa a la vez. Si quieres cambiar de
+      grupo, detén la sesión actual primero.
+    </p>
+
+    <div class="faq-q">¿Por qué el modo estricto bloquea el bypass?</div>
+    <p>
+      Para que no puedas usarlo impulsivamente. Si quieres flexibilidad, cambia
+      a modo Chill o Custom.
+    </p>
+
+    <div class="faq-q">¿Cómo sé si mi racha se rompió?</div>
+    <p>
+      Se rompe cuando usas el bypass. El contador de racha actual vuelve a 0,
+      pero el mejor registro histórico se conserva.
+    </p>
+
+    <div class="faq-q">¿Puedo importar datos de otra instalación?</div>
+    <p>
+      Sí. En Opciones → Backup → Importar. Selecciona el JSON exportado
+      previamente.
+    </p>
+
+    <div class="faq-q">¿Funciona en modo incógnito?</div>
+    <p>
+      Por defecto no, a menos que habilites "Permitir en incógnito" en
+      <code>chrome://extensions/</code> → detalles de la extensión. Ten en
+      cuenta que los datos se guardan en el mismo storage.
+    </p>
+
+    <hr style="margin: 32px 0; border: none; border-top: 1px solid #ddd" />
+    <p style="text-align: center; color: #999; font-size: 12px">
+      TimeWarden v3.0 — 100% local, sin servidores, sin sincronización.
+    </p>
+  </body>
+</html>
