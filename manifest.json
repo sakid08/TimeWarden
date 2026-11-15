@@ -39,7 +39,14 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["blocked.html", "blocked.js", "utils.js", "help.html"],
+      "resources": [
+        "blocked.html",
+        "blocked.js",
+        "utils.js",
+        "help.html",
+        "setup.html",
+        "setup.js"
+      ],
       "matches": ["<all_urls>"]
     }
   ]

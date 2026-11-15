@@ -5,15 +5,30 @@ let visTimer = null;
 let visibleStart = null;
 
 // estado del setup pendiente (para re-inyectar si el DOM se reemplaza)
-let pendingSetup = null; // { groupId, defaults }
+let pendingSetup = null;
 let setupObserver = null;
 
-// ---------- Control de medios durante el bloqueo ----------
-let mediaGuard = null; // { observer, interval, resumeHandler }
-let savedMediaStates = new Map(); // elemento → { wasPlaying: bool }
+// ---------- Control de medios mediante el bloqueo o setup con soporte Shadow DOM ----------
+let mediaGuard = null;
+let savedMediaStates = new Map();
+
+// Función recursiva para encontrar elementos multimedia incluyendo dentro de Shadow Roots (Ej: YouTube)
+function getAllMediaElements(root = document) {
+  let elements = [];
+  try {
+    elements.push(...root.querySelectorAll("video, audio"));
+    const allEls = root.querySelectorAll("*");
+    for (const el of allEls) {
+      if (el.shadowRoot) {
+        elements.push(...getAllMediaElements(el.shadowRoot));
+      }
+    }
+  } catch {}
+  return elements;
+}
 
 function pauseAllMedia() {
-  const mediaEls = document.querySelectorAll("video, audio");
+  const mediaEls = getAllMediaElements();
   mediaEls.forEach((m) => {
     try {
       if (!m.paused) {
@@ -27,12 +42,10 @@ function pauseAllMedia() {
 }
 
 function startMediaGuard() {
-  stopMediaGuard(); // por si ya había uno
+  stopMediaGuard();
 
-  // pausa inmediata
   pauseAllMedia();
 
-  // Si el usuario intenta reanudar, lo volvemos a pausar
   const onPlay = (e) => {
     const el = e.target;
     if (el && (el.tagName === "VIDEO" || el.tagName === "AUDIO")) {
@@ -44,9 +57,8 @@ function startMediaGuard() {
   document.addEventListener("play", onPlay, true);
   document.addEventListener("playing", onPlay, true);
 
-  // Re-pausar medios nuevos que aparezcan (páginas SPA, reproductores dinámicos)
   const observer = new MutationObserver(() => {
-    document.querySelectorAll("video, audio").forEach((m) => {
+    getAllMediaElements().forEach((m) => {
       if (!m.paused) {
         try {
           m.pause();
@@ -59,9 +71,8 @@ function startMediaGuard() {
     subtree: true,
   });
 
-  // Red de seguridad: cada 800ms re-pausar
   const interval = setInterval(() => {
-    document.querySelectorAll("video, audio").forEach((m) => {
+    getAllMediaElements().forEach((m) => {
       if (!m.paused) {
         try {
           m.pause();
@@ -119,23 +130,20 @@ new MutationObserver(() => {
   if (currentUrl !== lastUrl) {
     lastUrl = currentUrl;
 
-    // Consultar el estado actual al background al cambiar de página dinámicamente
-    chrome.runtime.sendMessage({ action: "getStatus" }, (resp) => {
-      if (!resp) return;
-
-      // Si hay un descanso activo, asegurarnos de mostrar el bloqueo
-      if (resp.activeBreak) {
-        showBlockOverlay(
-          resp.activeBreak.breakDuration,
-          resp.activeBreak.endTime,
-          resp.activeBreak.activities,
-        );
-      } else {
-        // Si no hay descanso activo pero estás navegando a una nueva URL,
-        // el background evaluará si debe mostrar el setup de sesión o dejar pasar.
-        // Opcionalmente puedes pedirle al background que re-valide la navegación aquí.
-      }
-    });
+    // Consultar al background si esta nueva ruta SPA requiere bloqueo o setup
+    chrome.runtime.sendMessage(
+      { action: "checkUrlStatus", url: currentUrl },
+      (resp) => {
+        if (!resp) return;
+        if (resp.action === "block") {
+          showBlockOverlay(resp.breakDuration, resp.breakEnd, resp.activities);
+        } else if (resp.action === "setup") {
+          showSessionSetup(resp.groupId, resp.defaults);
+        } else {
+          hideOverlays();
+        }
+      },
+    );
   }
 }).observe(document, { subtree: true, childList: true });
 
@@ -166,15 +174,12 @@ document.addEventListener("visibilitychange", () => {
 if (document.visibilityState === "visible") visibleStart = Date.now();
 
 // ---------- Helpers ----------
-
-// Espera a que document.body exista (o timeout)
 function waitForBody(cb, tries = 0) {
   if (document.body) return cb();
-  if (tries > 200) return; // ~10s
+  if (tries > 200) return;
   setTimeout(() => waitForBody(cb, tries + 1), 50);
 }
 
-// Vuelve a añadir el nodo si fue eliminado del DOM
 function keepAttached(node, reattachFn) {
   if (!node) return null;
   const obs = new MutationObserver(() => {
@@ -186,92 +191,51 @@ function keepAttached(node, reattachFn) {
   return obs;
 }
 
-// ---------- Session setup mejorado para SPAs (YouTube, etc.) ----------
+// ---------- Session setup mediante iframe aislado para SPAs ----------
 function showSessionSetup(groupId, defaults) {
   hideOverlays();
+  startMediaGuard();
   pendingSetup = { groupId, defaults };
 
-  // Intentar renderizar de inmediato
-  renderSessionSetup();
-
-  // Vigilar que el overlay no sea borrado por los scripts dinámicos de la página
-  if (setupObserver) setupObserver.disconnect();
-  setupObserver = keepAttached(
-    document.getElementById("session-setup-overlay"),
-    () => {
-      if (pendingSetup) renderSessionSetup();
-    },
-  );
-}
-
-function renderSessionSetup() {
-  if (!pendingSetup) return;
-  const { groupId, defaults } = pendingSetup;
-
   waitForBody(() => {
-    // Evitar duplicados
-    const existing = document.getElementById("session-setup-overlay");
+    const existing = document.getElementById("session-setup-iframe");
     if (existing) existing.remove();
 
-    const overlay = document.createElement("div");
-    overlay.id = "session-setup-overlay";
-    // Forzamos un z-index ultra alto y position fixed para garantizar que esté por encima de todo en YouTube
-    overlay.style.cssText = `position:fixed !important; inset:0 !important; background:rgba(0,0,0,0.92) !important; z-index:2147483647 !important; display:flex !important; justify-content:center !important; align-items:center !important; color:white !important; font-family:system-ui,Arial !important;`;
+    const iframe = document.createElement("iframe");
+    iframe.src = chrome.runtime.getURL("setup.html");
+    iframe.id = "session-setup-iframe";
+    iframe.style.cssText = `position:fixed !important; inset:0 !important; width:100% !important; height:100% !important; border:none !important; z-index:2147483647 !important; background:rgba(0,0,0,0.92) !important;`;
 
-    overlay.innerHTML = `
-      <div style="background:#1e1e1e; padding:36px; border-radius:16px; max-width:460px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.6); pointer-events:auto;">
-        <h2 style="margin:0 0 8px; color:white;">${defaults.modeIcon} Configura tu sesión</h2>
-        <p style="margin:0 0 20px; color:#aaa;">Modo: <strong>${defaults.modeName}</strong>${defaults.strict ? ' · <span style="color:#ff6b6b;">Estricto</span>' : ""}</p>
-        <div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-size:14px;">Sesión (min)</label>
-          <input type="number" id="session-duration" value="${defaults.sessionDuration}" min="1" max="240" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#2a2a2a;color:white;box-sizing:border-box;font-size:16px;"></div>
-        <div style="margin-bottom:16px;"><label style="display:block;margin-bottom:6px;font-size:14px;">Descanso (min)</label>
-          <input type="number" id="break-duration" value="${defaults.breakDuration}" min="1" max="120" style="width:100%;padding:10px;border-radius:8px;border:1px solid #444;background:#2a2a2a;color:white;box-sizing:border-box;font-size:16px;"></div>
-        <button id="suggest-btn" style="width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:1px solid #555;background:#2a2a2a;color:#bbb;cursor:pointer;font-size:14px;">🤖 Sugerir duración con IA</button>
-        <button id="start-session-btn" style="width:100%;padding:14px;border-radius:8px;border:none;background:#4CAF50;color:white;font-size:16px;font-weight:bold;cursor:pointer;">▶ Iniciar sesión</button>
-      </div>`;
+    (document.body || document.documentElement).appendChild(iframe);
+    overlayFrame = iframe;
 
-    // Asegurarnos de agregarlo al documento de forma segura
-    (document.body || document.documentElement).appendChild(overlay);
-
-    document.getElementById("suggest-btn").addEventListener("click", () => {
-      chrome.runtime.sendMessage(
-        { action: "suggestDuration", mode: defaults.mode },
-        (r) => {
-          if (r?.suggested)
-            document.getElementById("session-duration").value = r.suggested;
-        },
-      );
-    });
-
-    document
-      .getElementById("start-session-btn")
-      .addEventListener("click", () => {
-        const sd =
-          parseInt(document.getElementById("session-duration").value) ||
-          defaults.sessionDuration;
-        const bd =
-          parseInt(document.getElementById("break-duration").value) ||
-          defaults.breakDuration;
-        chrome.runtime.sendMessage({
-          action: "startSession",
+    iframe.onload = () => {
+      iframe.contentWindow.postMessage(
+        {
+          type: "initSetup",
           groupId,
-          sessionDuration: sd,
-          breakDuration: bd,
-        });
-        pendingSetup = null;
-        hideOverlays();
-      });
+          defaults,
+        },
+        "*",
+      );
+    };
+
+    if (setupObserver) setupObserver.disconnect();
+    setupObserver = keepAttached(iframe, () => {
+      if (pendingSetup)
+        showSessionSetup(pendingSetup.groupId, pendingSetup.defaults);
+    });
   });
 }
 
 // ---------- Block overlay ----------
 function showBlockOverlay(bd, be, activities) {
   hideOverlays();
-  startMediaGuard(); // ⬅️ pausar todo el contenido multimedia
+  startMediaGuard();
   waitForBody(() => {
     const iframe = document.createElement("iframe");
     iframe.src = chrome.runtime.getURL("blocked.html");
-    iframe.style.cssText = `position:fixed;inset:0;width:100%;height:100%;border:none;z-index:2147483647;background:rgba(0,0,0,0.95);`;
+    iframe.style.cssText = `position:fixed !important; inset:0 !important; width:100% !important; height:100% !important; border:none !important; z-index:2147483647 !important; background:rgba(0,0,0,0.95) !important;`;
     iframe.id = "block-overlay-iframe";
     document.body.appendChild(iframe);
     overlayFrame = iframe;
@@ -293,7 +257,7 @@ function showMinuteWarning(minutes) {
   if (warningElement) return;
   waitForBody(() => {
     const w = document.createElement("div");
-    w.style.cssText = `position:fixed;bottom:30px;right:30px;background:#ff9800;color:#000;padding:16px 24px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,0.3);z-index:2147483646;font-weight:bold;font-size:18px;font-family:system-ui,Arial;`;
+    w.style.cssText = `position:fixed !important; bottom:30px !important; right:30px !important; background:#ff9800 !important; color:#000 !important; padding:16px 24px !important; border-radius:12px !important; box-shadow:0 4px 20px rgba(0,0,0,0.3) !important; z-index:2147483646 !important; font-weight:bold !important; font-size:18px !important; font-family:system-ui,Arial !important;`;
     w.textContent = `⚠️ Tu sesión termina en ${minutes} minuto(s)`;
     document.body.appendChild(w);
     warningElement = w;
@@ -315,38 +279,48 @@ function hideOverlays() {
     warningElement.remove();
     warningElement = null;
   }
-  const s = document.getElementById("session-setup-overlay");
+  const s = document.getElementById("session-setup-iframe");
   if (s) s.remove();
   if (setupObserver) {
     setupObserver.disconnect();
     setupObserver = null;
   }
-  stopMediaGuard(); // liberar
+  stopMediaGuard();
 }
 
-// ---------- Bypass desde el iframe ----------
+// ---------- Mensajes desde los iframes ----------
 window.addEventListener("message", (event) => {
-  if (event.data?.type !== "bypassAttempt") return;
   if (overlayFrame && event.source !== overlayFrame.contentWindow) return;
-  chrome.runtime.sendMessage({ action: "bypassBreak" }, (resp) => {
-    if (resp && !resp.success && resp.reason === "strict") {
-      if (overlayFrame?.contentWindow)
-        overlayFrame.contentWindow.postMessage(
-          { type: "bypassDenied", reason: "strict" },
-          "*",
-        );
-    }
-  });
+
+  if (event.data?.type === "setupCompleted") {
+    pendingSetup = null;
+    hideOverlays();
+    return;
+  }
+
+  if (event.data?.type === "bypassAttempt") {
+    chrome.runtime.sendMessage({ action: "bypassBreak" }, (resp) => {
+      if (resp && !resp.success && resp.reason === "strict") {
+        if (overlayFrame?.contentWindow) {
+          overlayFrame.contentWindow.postMessage(
+            { type: "bypassDenied", reason: "strict" },
+            "*",
+          );
+        }
+      }
+    });
+  }
 });
 
-// ---------- Estado inicial ----------
-chrome.runtime.sendMessage({ action: "getStatus" }, (resp) => {
-  if (!resp) return;
-  if (resp.activeBreak)
-    showBlockOverlay(
-      resp.activeBreak.breakDuration,
-      resp.activeBreak.endTime,
-      resp.activeBreak.activities,
-    );
-  // si ya hay un setup pendiente (no, el background no lo guarda), nada más
-});
+// ---------- Estado inicial verificado por URL ----------
+chrome.runtime.sendMessage(
+  { action: "checkUrlStatus", url: location.href },
+  (resp) => {
+    if (!resp) return;
+    if (resp.action === "block") {
+      showBlockOverlay(resp.breakDuration, resp.breakEnd, resp.activities);
+    } else if (resp.action === "setup") {
+      showSessionSetup(resp.groupId, resp.defaults);
+    }
+  },
+);

@@ -57,6 +57,50 @@ async function getGroupForUrl(url) {
   return null;
 }
 
+// Determina qué acción debe tomar una URL (bloqueo, setup o ninguna)
+async function determineUrlAction(url) {
+  if (!url || !url.startsWith("http")) return { action: "none" };
+  const data = await getData();
+  if (isInWhitelist(url, data.whitelist)) return { action: "none" };
+  if (isAnalysisPaused(data)) return { action: "none" };
+  if (!isWithinSchedule(data.schedule)) return { action: "none" };
+
+  const group = await getGroupForUrl(url);
+  if (!group) return { action: "none" };
+
+  const now = Date.now();
+  if (data.bypassUnlockedUntil && now < data.bypassUnlockedUntil)
+    return { action: "none" };
+  if (data.activeSession && data.activeSession.groupId === group.id)
+    return { action: "none" };
+
+  // --- Descanso activo: bloquear solo si pertenece al grupo ---
+  if (data.activeBreak && data.activeBreak.groupId === group.id) {
+    return {
+      action: "block",
+      breakDuration: data.activeBreak.breakDuration,
+      breakEnd: data.activeBreak.endTime,
+      activities: data.activeBreak.activities || [],
+    };
+  }
+
+  // --- Sin sesión: mostrar setup en páginas del grupo ---
+  const modeDef = getModeDefaults(data);
+  return {
+    action: "setup",
+    groupId: group.id,
+    defaults: {
+      sessionDuration: data.settings.defaultSession || modeDef.defaultSession,
+      breakDuration: data.settings.defaultBreak || modeDef.defaultBreak,
+      mode: getActiveMode(data),
+      strict: isStrictMode(data),
+      bypassPhrase: data.settings.bypassPhrase,
+      modeName: modeDef.name,
+      modeIcon: modeDef.icon,
+    },
+  };
+}
+
 async function notifyTabs(groupId, action, payload) {
   const tabs = await chrome.tabs.query({});
   for (const tab of tabs) {
@@ -307,66 +351,34 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
 
   await recordVisit(url, data, details.tabId);
 
-  if (!isWithinSchedule(data.schedule)) return;
+  const actionRes = await determineUrlAction(url);
+  if (actionRes.action === "none") return;
 
-  const group = await getGroupForUrl(url);
-  if (!group) return;
+  const blockMsg =
+    actionRes.action === "block"
+      ? {
+          action: "block",
+          breakDuration: actionRes.breakDuration,
+          breakEnd: actionRes.breakEnd,
+          activities: actionRes.activities || [],
+        }
+      : {
+          action: "showSessionSetup",
+          groupId: actionRes.groupId,
+          defaults: actionRes.defaults,
+        };
 
-  const now = Date.now();
-  if (data.bypassUnlockedUntil && now < data.bypassUnlockedUntil) return;
-  if (data.activeSession && data.activeSession.groupId === group.id) return;
-
-  // --- Descanso activo: bloquear ---
-  if (data.activeBreak && data.activeBreak.groupId === group.id) {
-    const blockMsg = {
-      action: "block",
-      breakDuration: data.activeBreak.breakDuration,
-      breakEnd: data.activeBreak.endTime,
-      activities: data.activeBreak.activities || [],
-    };
-    // reintentos por si content.js aún no estaba listo
+  // reintentos por si content.js aún no estaba listo
+  chrome.tabs.sendMessage(details.tabId, blockMsg).catch(() => {});
+  setTimeout(() => {
     chrome.tabs.sendMessage(details.tabId, blockMsg).catch(() => {});
-    setTimeout(() => {
-      chrome.tabs.sendMessage(details.tabId, blockMsg).catch(() => {});
-    }, 500);
-    setTimeout(() => {
-      chrome.tabs.sendMessage(details.tabId, blockMsg).catch(() => {});
-    }, 1500);
-    return;
-  }
-
-  // --- Sin sesión: mostrar setup con reintentos ---
-  const modeDef = getModeDefaults(data);
-  const setupMsg = {
-    action: "showSessionSetup",
-    groupId: group.id,
-    defaults: {
-      sessionDuration: data.settings.defaultSession || modeDef.defaultSession,
-      breakDuration: data.settings.defaultBreak || modeDef.defaultBreak,
-      mode: getActiveMode(data),
-      strict: isStrictMode(data),
-      bypassPhrase: data.settings.bypassPhrase,
-      modeName: modeDef.name,
-      modeIcon: modeDef.icon,
-    },
-  };
-
-  // intento 1 (inmediato)
-  chrome.tabs.sendMessage(details.tabId, setupMsg).catch(() => {});
-
-  // reintento 2 a los 500ms (por si content.js aún no estaba listo)
-  setTimeout(() => {
-    chrome.tabs.sendMessage(details.tabId, setupMsg).catch(() => {});
   }, 500);
-
-  // reintento 3 a los 1500ms (por si la página tardó en cargar body)
   setTimeout(() => {
-    chrome.tabs.sendMessage(details.tabId, setupMsg).catch(() => {});
+    chrome.tabs.sendMessage(details.tabId, blockMsg).catch(() => {});
   }, 1500);
 });
 
 async function recordVisit(url, data, tabId = null) {
-  // cierra la visita anterior de este tab
   if (tabId != null) {
     const prev = lastVisitAt.get(tabId);
     if (prev && prev.url && prev.url !== url) {
@@ -381,7 +393,6 @@ async function recordVisit(url, data, tabId = null) {
     lastVisitAt.set(tabId, { url, ts: Date.now() });
   }
 
-  // retorno tras bypass
   if (lastBypassAt && Date.now() - lastBypassAt < 10 * 60000) {
     await EnergyManager.enqueue("returnAfterBypass", {
       seconds: Math.round((Date.now() - lastBypassAt) / 1000),
@@ -389,7 +400,6 @@ async function recordVisit(url, data, tabId = null) {
     lastBypassAt = null;
   }
 
-  // rapid reopen
   try {
     const host = new URL(url).hostname;
     const closedAt = lastClosedDomain.get(host);
@@ -574,7 +584,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   (async () => {
     const data = await getData();
 
-    if (message.action === "startSession") {
+    if (message.action === "checkUrlStatus") {
+      const res = await determineUrlAction(message.url || sender.tab?.url);
+      sendResponse(res);
+    } else if (message.action === "startSession") {
       await startSession(
         message.groupId,
         message.sessionDuration,
@@ -722,7 +735,6 @@ async function purgeAndCompact(force = false) {
     if (ai[k]) ai[k] = ai[k].filter((e) => (e.timestamp || 0) > cutoff);
   });
 
-  // compactar visits > 2 días: agregar a byDomain y borrar
   const compactCutoff = now - 2 * 86400000;
   const old = (ai.visits || []).filter(
     (v) => (v.timestamp || 0) < compactCutoff,
