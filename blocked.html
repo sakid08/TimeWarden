@@ -1,7 +1,8 @@
 <!doctype html>
-<html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <title>Descanso obligatorio - TimeWarden</title>
     <style>
       * {
         margin: 0;
@@ -9,9 +10,15 @@
         box-sizing: border-box;
       }
       body {
-        background: rgba(0, 0, 0, 0.95);
-        color: white;
-        font-family: system-ui, Arial;
+        background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        color: #f8fafc;
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -20,101 +27,157 @@
         text-align: center;
       }
       .container {
-        max-width: 620px;
+        max-width: 540px;
         width: 100%;
-        background: #1e1e1e;
+        background: rgba(30, 41, 59, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         padding: 40px;
-        border-radius: 16px;
-        box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+        border-radius: 20px;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
       }
       h1 {
-        color: #ff6b6b;
-        margin-bottom: 12px;
-        font-size: 28px;
+        color: #f87171;
+        margin-bottom: 8px;
+        font-size: 26px;
+        font-weight: 700;
       }
       .break-message {
-        font-size: 16px;
-        color: #bbb;
+        font-size: 15px;
+        color: #94a3b8;
         margin-bottom: 24px;
+        line-height: 1.5;
       }
       .timer {
         font-size: 56px;
-        margin: 20px 0;
-        letter-spacing: 4px;
+        margin: 16px 0;
+        letter-spacing: 2px;
         font-variant-numeric: tabular-nums;
+        font-weight: 800;
+        color: #ffffff;
       }
       .activities {
-        background: #2a2a2a;
+        background: rgba(15, 23, 42, 0.6);
         border-radius: 12px;
         padding: 16px;
         margin: 20px 0;
         text-align: left;
+        border: 1px solid rgba(255, 255, 255, 0.04);
       }
       .activities h3 {
-        font-size: 14px;
-        color: #4caf50;
+        font-size: 12px;
+        color: #34d399;
         margin-bottom: 10px;
         text-transform: uppercase;
         letter-spacing: 1px;
+        font-weight: 700;
       }
       .activities ul {
         list-style: none;
       }
       .activities li {
         padding: 6px 0;
-        font-size: 15px;
-        color: #ddd;
+        font-size: 14px;
+        color: #cbd5e1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .activities li::before {
+        content: "•";
+        color: #34d399;
+        font-weight: bold;
       }
       .bypass-section {
-        margin-top: 28px;
-        border-top: 1px solid #333;
+        margin-top: 24px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
         padding-top: 20px;
       }
       .bypass-section p {
-        font-size: 13px;
-        color: #999;
+        font-size: 12px;
+        color: #94a3b8;
         margin-bottom: 10px;
       }
       .bypass-section input {
         width: 100%;
         padding: 12px;
-        margin: 10px 0;
-        border-radius: 8px;
-        border: 1px solid #444;
-        background: #2a2a2a;
+        margin: 6px 0 12px 0;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.8);
         color: white;
         font-size: 13px;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .bypass-section input:focus {
+        border-color: #f87171;
       }
       .bypass-section button {
-        background: #ff6b6b;
+        background: #ef4444;
         color: white;
         border: none;
         padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: bold;
+        border-radius: 10px;
+        font-weight: 600;
         cursor: pointer;
         width: 100%;
-        font-size: 15px;
+        font-size: 14px;
+        transition:
+          background 0.2s,
+          transform 0.1s;
+      }
+      .bypass-section button:active {
+        transform: scale(0.99);
       }
       .bypass-section button:hover {
-        background: #e55a5a;
+        background: #dc2626;
       }
       .bypass-section button:disabled {
-        background: #555;
+        background: #334155;
         cursor: not-allowed;
+        color: #64748b;
       }
+
       .error {
-        color: #ff6b6b;
-        margin-top: 10px;
-        font-size: 13px;
+        color: #f87171;
+        margin-top: 8px;
+        font-size: 12px;
       }
       .strict-note {
-        color: #ff9800;
+        color: #fbbf24;
         font-size: 12px;
         margin-top: 8px;
       }
       .hidden {
         display: none;
+      }
+
+      .leave-container {
+        margin-top: 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        padding-top: 16px;
+      }
+      .leave-container p {
+        font-size: 12px;
+        color: #94a3b8;
+        margin-bottom: 10px;
+      }
+      #leave-btn {
+        background: transparent;
+        color: #cbd5e1;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 11px 24px;
+        border-radius: 10px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+        font-size: 14px;
+        transition: background 0.2s;
+      }
+      #leave-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
       }
     </style>
   </head>
@@ -122,7 +185,7 @@
     <div class="container">
       <h1>⏳ Descanso obligatorio</h1>
       <div class="break-message">
-        Es momento de desconectar. Respeta tu descanso.
+        Es momento de desconectar. Cuida tu enfoque y respeta tu descanso.
       </div>
       <div class="timer" id="break-timer">00:00</div>
 
@@ -132,7 +195,7 @@
       </div>
 
       <div class="bypass-section" id="bypass-section">
-        <p>Emergencia: escribe la frase exacta para desbloquear</p>
+        <p>¿Emergencia? Escribe la frase exacta para desbloquear:</p>
         <input
           type="text"
           id="bypass-input"
@@ -145,28 +208,9 @@
         </div>
       </div>
 
-      <div
-        style="margin-top: 20px; border-top: 1px solid #333; padding-top: 16px"
-      >
-        <p style="font-size: 13px; color: #999; margin-bottom: 10px">
-          ¿No quieres esperar? Puedes salir de esta página.
-        </p>
-        <button
-          id="leave-btn"
-          style="
-            background: transparent;
-            color: #bbb;
-            border: 1px solid #555;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            font-size: 15px;
-          "
-        >
-          🚪 Salir de esta página
-        </button>
+      <div class="leave-container">
+        <p>¿No quieres esperar? Puedes salir de esta página.</p>
+        <button id="leave-btn">🚪 Salir de esta página</button>
       </div>
     </div>
     <script src="blocked.js"></script>

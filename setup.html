@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Configurar Sesión</title>
+    <title>Configurar Sesión - TimeWarden</title>
     <style>
       * {
         box-sizing: border-box;
@@ -11,102 +11,109 @@
         padding: 0;
       }
       body {
-        background: rgba(0, 0, 0, 0.92);
-        color: #ffffff;
+        background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        color: #f8fafc;
         font-family:
           system-ui,
           -apple-system,
           BlinkMacSystemFont,
           "Segoe UI",
           Roboto,
-          Arial,
           sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
-        overflow: hidden;
+        min-height: 100vh;
+        padding: 20px;
       }
       .card {
-        background: #1e1e1e;
+        background: rgba(30, 41, 59, 0.75);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         padding: 36px;
-        border-radius: 16px;
-        max-width: 460px;
-        width: 90%;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
-        border: 1px solid #2c2c2c;
+        border-radius: 20px;
+        max-width: 440px;
+        width: 100%;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
       }
       h2 {
-        margin-bottom: 8px;
+        margin-bottom: 6px;
         font-size: 24px;
+        font-weight: 700;
         color: #ffffff;
       }
       .subtitle {
         margin-bottom: 24px;
-        color: #aaaaaa;
-        font-size: 15px;
+        color: #94a3b8;
+        font-size: 14px;
       }
       .strict-badge {
-        color: #ff6b6b;
+        color: #f87171;
         font-weight: 600;
       }
-      .form-group {
-        margin-bottom: 18px;
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 20px;
       }
-      label {
+      .form-group label {
         display: block;
         margin-bottom: 6px;
-        font-size: 14px;
-        color: #dddddd;
+        font-size: 12px;
+        font-weight: 500;
+        color: #cbd5e1;
       }
       input[type="number"] {
         width: 100%;
         padding: 12px;
-        border-radius: 8px;
-        border: 1px solid #444444;
-        background: #2a2a2a;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(15, 23, 42, 0.8);
         color: #ffffff;
         font-size: 16px;
+        font-variant-numeric: tabular-nums;
         outline: none;
         transition: border-color 0.2s;
       }
       input[type="number"]:focus {
-        border-color: #4caf50;
+        border-color: #10b981;
       }
       .btn {
         width: 100%;
-        border-radius: 8px;
+        border-radius: 10px;
         cursor: pointer;
         font-family: inherit;
-        transition:
-          opacity 0.2s,
-          transform 0.1s;
+        transition: all 0.15s;
       }
       .btn:active {
         transform: scale(0.99);
       }
       .btn-suggest {
-        margin-bottom: 12px;
-        padding: 11px;
-        border: 1px solid #555555;
-        background: #2a2a2a;
-        color: #cccccc;
-        font-size: 14px;
+        margin-bottom: 10px;
+        padding: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05);
+        color: #e2e8f0;
+        font-size: 13px;
+        font-weight: 600;
       }
       .btn-suggest:hover {
-        background: #333333;
+        background: rgba(255, 255, 255, 0.1);
         color: #ffffff;
       }
       .btn-start {
         padding: 14px;
         border: none;
-        background: #4caf50;
+        background: #10b981;
         color: #ffffff;
-        font-size: 16px;
-        font-weight: bold;
+        font-size: 15px;
+        font-weight: 700;
+        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
       }
       .btn-start:hover {
-        background: #45a049;
+        background: #059669;
       }
     </style>
   </head>
@@ -115,20 +122,28 @@
       <h2 id="title">⏱️ Configura tu sesión</h2>
       <p class="subtitle" id="subtitle">Modo: <strong>Estándar</strong></p>
 
-      <div class="form-group">
-        <label for="session-duration">Sesión (min)</label>
-        <input
-          type="number"
-          id="session-duration"
-          value="25"
-          min="1"
-          max="240"
-        />
-      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="session-duration">Sesión (min)</label>
+          <input
+            type="number"
+            id="session-duration"
+            value="25"
+            min="1"
+            max="240"
+          />
+        </div>
 
-      <div class="form-group">
-        <label for="break-duration">Descanso (min)</label>
-        <input type="number" id="break-duration" value="5" min="1" max="120" />
+        <div class="form-group">
+          <label for="break-duration">Descanso (min)</label>
+          <input
+            type="number"
+            id="break-duration"
+            value="5"
+            min="1"
+            max="120"
+          />
+        </div>
       </div>
 
       <button id="suggest-btn" class="btn btn-suggest">

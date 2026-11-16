@@ -1,487 +1,760 @@
 <!doctype html>
-<html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f3f6fb" />
     <title>TimeWarden</title>
     <style>
+      :root {
+        color-scheme: light;
+        --bg: #d8d8d8;
+        --surface: #ffffff;
+        --surface-raised: #f8faff;
+        --surface-soft: #edf2fb;
+        --line: #e2e8f2;
+        --text: #18243a;
+        --muted: #687891;
+        --subtle: #91a0b6;
+        --accent: #536de8;
+        --accent-strong: #405bd8;
+        --mint: #168b70;
+        --red: #d94f68;
+        --amber: #a96c12;
+        --radius: 16px;
+        --shadow: 0 8px 24px rgba(35, 55, 90, 0.055);
+      }
+
       * {
         box-sizing: border-box;
-      }
-      body {
-        width: 350px;
+        margin: 0;
         padding: 0;
-        margin: 0;
-        font-family: system-ui, Arial;
-        font-size: 13px;
-        background: #f7f7f7;
-        color: #222;
       }
-      .header {
-        background: linear-gradient(135deg, #4caf50, #2e7d32);
-        color: white;
-        padding: 12px 14px;
+
+      body {
+        width: 390px;
+        min-height: 560px;
+        max-height: 700px;
+        overflow-y: auto;
+        background:
+          radial-gradient(
+            ellipse at 85% -10%,
+            rgba(83, 109, 232, 0.1),
+            transparent 38%
+          ),
+          var(--bg);
+        color: var(--text);
+        font:
+          13px/1.45 Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        scrollbar-width: thin;
+        scrollbar-color: #cbd5e4 transparent;
+      }
+
+      button,
+      input,
+      select {
+        font: inherit;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+      }
+      .app-shell {
+        padding: 17px 16px 20px;
+      }
+
+      .topbar {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 17px;
       }
-      .header h1 {
-        font-size: 15px;
-        margin: 0;
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
-      .header .mode-pill {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 4px 10px;
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 36px;
+        height: 36px;
+        border: 1px solid #dce3ff;
         border-radius: 12px;
-        font-size: 11px;
-        font-weight: 600;
+        background: linear-gradient(145deg, #edf0ff, #e9f8f4);
+        color: #536de8;
+        font-size: 17px;
+        box-shadow: 0 5px 15px rgba(83, 109, 232, 0.09);
       }
+      .brand-name {
+        font-size: 15px;
+        font-weight: 750;
+        letter-spacing: -0.35px;
+      }
+      .brand-caption {
+        color: var(--subtle);
+        font-size: 10px;
+        margin-top: 1px;
+      }
+      .mode-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: #fff;
+        color: #586780;
+        font-size: 10px;
+        font-weight: 650;
+      }
+      .mode-pill::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--mint);
+      }
+
       .level-banner {
-        padding: 6px 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 8px 12px;
+        margin-bottom: 13px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.8);
+        color: var(--muted);
         font-size: 11px;
-        text-align: center;
-        font-weight: 600;
+        font-weight: 650;
+      }
+      .level-banner::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
       }
       .level-light {
-        background: #e8f5e9;
-        color: #2e7d32;
+        color: #168b70;
       }
       .level-standard {
-        background: #e3f2fd;
-        color: #1565c0;
+        color: #416bc2;
       }
       .level-invasive {
-        background: #fff3e0;
-        color: #e65100;
+        color: #a96c12;
       }
       .level-total {
-        background: #ffebee;
-        color: #c62828;
+        color: #c43f58;
       }
       .level-paused {
-        background: #f5f5f5;
-        color: #616161;
+        color: #687891;
       }
-      .section {
-        background: white;
-        margin: 10px;
-        border-radius: 10px;
-        padding: 12px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+      .panel {
+        margin-bottom: 12px;
+        padding: 15px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        background: var(--surface);
+        box-shadow: var(--shadow);
       }
-      .section-title {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #666;
-        margin: 0 0 10px;
+      .panel-heading {
         display: flex;
-        justify-content: space-between;
         align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 13px;
+      }
+      .panel-title {
+        color: #61718b;
+        font-size: 10px;
+        font-weight: 750;
+        letter-spacing: 1.05px;
+        text-transform: uppercase;
+      }
+      .panel-kicker {
+        color: var(--subtle);
+        font-size: 10px;
       }
       .badge {
-        background: #e8f5e9;
-        color: #2e7d32;
-        padding: 2px 8px;
-        border-radius: 10px;
+        padding: 4px 8px;
+        border: 1px solid #cceee4;
+        border-radius: 999px;
+        background: #effaf6;
+        color: #168b70;
+        font-size: 9px;
+        font-weight: 750;
+        letter-spacing: 0.45px;
+        text-transform: uppercase;
+      }
+
+      .focus-panel {
+        position: relative;
+        overflow: hidden;
+        padding: 17px 16px 15px;
+        background:
+          radial-gradient(
+            circle at 50% 35%,
+            rgba(113, 133, 255, 0.08),
+            transparent 48%
+          ),
+          #fff;
+      }
+      .focus-panel::after {
+        content: "";
+        position: absolute;
+        width: 170px;
+        height: 170px;
+        top: -115px;
+        right: -75px;
+        border: 1px solid rgba(83, 109, 232, 0.1);
+        border-radius: 50%;
+        box-shadow:
+          0 0 0 18px rgba(83, 109, 232, 0.025),
+          0 0 0 38px rgba(83, 109, 232, 0.018);
+        pointer-events: none;
+      }
+      .timer-wrap {
+        text-align: center;
+        padding: 6px 0 12px;
+      }
+      .timer-eyebrow {
+        color: var(--muted);
         font-size: 10px;
-        text-transform: none;
+        font-weight: 650;
+        letter-spacing: 1.4px;
+        text-transform: uppercase;
       }
       .timer {
-        font-size: 30px;
-        text-align: center;
+        margin: 3px 0 0;
+        color: #202d49;
+        font-size: 48px;
+        line-height: 1.15;
+        font-weight: 750;
+        letter-spacing: -2.5px;
         font-variant-numeric: tabular-nums;
-        font-weight: 600;
-        margin: 6px 0;
       }
       .status-line {
-        text-align: center;
-        font-size: 12px;
-        color: #666;
-        margin-bottom: 8px;
+        min-height: 18px;
+        color: var(--muted);
+        font-size: 11px;
       }
-      .row {
-        display: flex;
-        gap: 6px;
-        align-items: center;
+      .streak-bar,
+      .ai-tip {
+        margin: 7px 0;
       }
-      .row > * {
-        flex: 1;
+      .mode-selector {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 5px;
+        margin: 10px 0 13px;
+      }
+      .mode-btn {
+        min-width: 0;
+        padding: 8px 2px 7px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: #f7f9fd;
+        color: var(--muted);
+        font-size: 9px;
+        transition: 0.18s ease;
+      }
+      .mode-btn .icon {
+        display: block;
+        margin-bottom: 3px;
+        font-size: 15px;
+      }
+      .mode-btn:hover {
+        border-color: #bdc9f8;
+        color: var(--text);
+      }
+      .mode-btn.active {
+        border-color: #aebcf7;
+        background: #eef1ff;
+        color: #405bd8;
+        box-shadow: inset 0 0 0 1px rgba(83, 109, 232, 0.05);
+        font-weight: 700;
+      }
+
+      .field-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
       }
       label.field {
         display: block;
-        font-size: 11px;
-        color: #666;
-        margin-bottom: 4px;
+        margin-bottom: 5px;
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 600;
       }
       input[type="number"],
       input[type="text"],
       select {
         width: 100%;
-        padding: 7px 9px;
-        border: 1px solid #ddd;
-        border-radius: 6px;
-        font-size: 13px;
-        background: #fafafa;
-        font-family: inherit;
+        min-width: 0;
+        height: 36px;
+        padding: 0 10px;
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        outline: none;
+        background: #f8faff;
+        color: var(--text);
+        font-size: 11px;
+        transition:
+          border-color 0.18s,
+          background 0.18s;
+      }
+      input::placeholder {
+        color: #9aa7ba;
+      }
+      input:focus,
+      select:focus {
+        border-color: #8c9bea;
+        background: #fff;
+      }
+      select option {
+        background: #fff;
+        color: var(--text);
+      }
+
+      .button-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 11px;
       }
       button {
+        min-height: 36px;
         padding: 8px 12px;
-        border-radius: 7px;
-        border: none;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        font-family: inherit;
-        transition: opacity 0.15s;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: 700;
+        transition:
+          transform 0.15s,
+          filter 0.15s,
+          border-color 0.15s,
+          background 0.15s;
       }
-      button:hover {
-        opacity: 0.9;
+      button:hover:not(:disabled) {
+        filter: brightness(0.98);
       }
-      button:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
+      button:active:not(:disabled) {
+        transform: translateY(1px);
+      }
+      .button-row > button {
+        flex: 1;
       }
       .btn-primary {
-        background: #4caf50;
-        color: white;
-      }
-      .btn-danger {
-        background: #ff5252;
-        color: white;
+        background: linear-gradient(135deg, #7185ed, #536de8);
+        color: #fff;
+        box-shadow: 0 5px 14px rgba(83, 109, 232, 0.16);
       }
       .btn-secondary {
-        background: #607d8b;
-        color: white;
+        border-color: var(--line);
+        background: #f1f4fa;
+        color: #52627b;
+        border-color: #8b9bb8;
+      }
+      .btn-danger {
+        background: #fff0f2;
+        border-color: #f7d4da;
+        color: #c9435b;
       }
       .btn-ghost {
-        background: transparent;
-        color: #4caf50;
-        border: 1px solid #4caf50;
+        border-color: #d5dcfb;
+        background: #f5f6ff;
+        color: #5368d0;
       }
       .btn-ghost-danger {
-        background: transparent;
-        color: #ff5252;
-        border: 1px solid #ff5252;
+        border-color: #f2d2d8;
+        background: #fff;
+        color: #c9435b;
       }
       .btn-block {
         width: 100%;
       }
-      .btn-row {
-        display: flex;
-        gap: 6px;
-        margin-top: 6px;
+      #stop-session-btn {
+        margin-top: 8px;
       }
-      .btn-row > button {
-        flex: 1;
-      }
+
       .page-info {
-        background: #f5f5f5;
-        padding: 10px;
-        border-radius: 6px;
-        margin-bottom: 10px;
-        font-size: 12px;
+        padding: 11px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: #f8faff;
       }
-      .page-info .favicon {
-        width: 16px;
-        height: 16px;
-        vertical-align: middle;
-        margin-right: 6px;
+      .page-heading {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
       }
-      .page-info .url {
-        color: #555;
-        word-break: break-all;
-        font-family: monospace;
+      .favicon {
+        width: 17px;
+        height: 17px;
+        object-fit: contain;
+        flex: 0 0 auto;
+      }
+      #page-title {
+        overflow: hidden;
+        color: #263650;
         font-size: 11px;
+        font-weight: 650;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .url {
         display: block;
-        margin-top: 4px;
+        margin-top: 7px;
+        overflow-wrap: anywhere;
+        color: var(--subtle);
+        font:
+          10px/1.45 ui-monospace,
+          SFMono-Regular,
+          Consolas,
+          monospace;
       }
       .page-status {
-        display: inline-block;
-        padding: 2px 8px;
-        border-radius: 10px;
-        font-size: 10px;
-        font-weight: 700;
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        font-size: 9px;
+        font-weight: 750;
+        letter-spacing: 0.4px;
         text-transform: uppercase;
       }
       .status-blocked {
-        background: #ffebee;
-        color: #c62828;
+        color: #c9435b;
+        background: #fff0f2;
+        border-color: #f7d4da;
       }
       .status-allowed {
-        background: #e8f5e9;
-        color: #2e7d32;
+        color: #168b70;
+        background: #effaf6;
+        border-color: #cceee4;
       }
       .status-neutral {
-        background: #eceff1;
-        color: #546e7a;
+        color: var(--muted);
+        background: #f4f6fa;
+      }
+      .divider {
+        height: 1px;
+        margin: 13px 0;
+        background: var(--line);
+      }
+      .create-group-row {
+        display: flex;
+        gap: 7px;
+      }
+      .create-group-row input {
+        flex: 1;
+      }
+      #create-group-with-url-btn {
+        flex: 0 0 38px;
+        padding: 0;
+        font-size: 18px;
       }
       .group-list {
+        display: grid;
+        gap: 4px;
+        max-height: 112px;
         margin-top: 8px;
-        max-height: 120px;
         overflow-y: auto;
       }
       .group-item {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 8px;
-        border-radius: 6px;
-        font-size: 12px;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 8px 9px;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        color: #586780;
+        font-size: 10px;
         cursor: pointer;
+        transition: 0.15s;
       }
       .group-item:hover {
-        background: #f5f5f5;
+        border-color: var(--line);
+        background: #f6f8fc;
       }
       .group-item.matched {
-        background: #e8f5e9;
+        border-color: #cceee4;
+        background: #effaf6;
+        color: #176e5b;
       }
       .group-item .action {
-        font-size: 11px;
-        color: #4caf50;
-        font-weight: 600;
+        color: #168b70;
+        font-weight: 700;
       }
-      .mode-selector {
+
+      .settings-row {
         display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 4px;
-        margin-bottom: 10px;
-      }
-      .mode-btn {
-        padding: 6px 2px;
-        border: 1px solid #e0e0e0;
-        background: #fafafa;
-        border-radius: 6px;
-        cursor: pointer;
-        text-align: center;
-        font-size: 10px;
-        line-height: 1.2;
-        color: #555;
-      }
-      .mode-btn .icon {
-        font-size: 16px;
-        display: block;
-        margin-bottom: 2px;
-      }
-      .mode-btn.active {
-        background: #4caf50;
-        color: white;
-        border-color: #4caf50;
+        grid-template-columns: 1fr 1fr;
+        gap: 9px;
       }
       .quick-stats {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        gap: 6px;
-        margin-bottom: 10px;
+        gap: 7px;
+        margin-bottom: 12px;
       }
       .quick-stat {
-        background: #f5f5f5;
-        padding: 8px 4px;
-        border-radius: 6px;
+        padding: 10px 5px;
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        background: #f8faff;
         text-align: center;
       }
       .quick-stat .num {
-        font-size: 16px;
-        font-weight: 700;
-        color: #4caf50;
+        color: #536de8;
+        font-size: 19px;
+        font-weight: 750;
+        line-height: 1.2;
+        font-variant-numeric: tabular-nums;
       }
       .quick-stat .lbl {
-        font-size: 9px;
-        color: #666;
+        margin-top: 4px;
+        color: var(--subtle);
+        font-size: 8px;
+        font-weight: 750;
+        letter-spacing: 0.7px;
         text-transform: uppercase;
       }
-      .ai-tip {
-        background: #e3f2fd;
-        padding: 8px 10px;
-        border-radius: 6px;
-        font-size: 11px;
-        color: #1565c0;
-        margin-bottom: 10px;
-        line-height: 1.4;
+      .shortcut-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 7px;
       }
-      .streak-bar {
-        background: #fff3e0;
-        padding: 8px 10px;
-        border-radius: 6px;
-        font-size: 12px;
-        text-align: center;
-        margin-bottom: 10px;
+      .shortcut-grid button {
+        min-height: 38px;
       }
-      .divider {
-        height: 1px;
-        background: #eee;
-        margin: 10px 0;
+      #help-btn {
+        grid-column: 1 / -1;
       }
+
       .toast {
         position: fixed;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
-        background: #333;
-        color: white;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 12px;
+        z-index: 100;
+        right: 14px;
+        bottom: 13px;
+        left: 14px;
+        padding: 10px 13px;
+        border: 1px solid rgba(30, 45, 70, 0.08);
+        border-radius: 11px;
+        background: #263650;
+        color: #fff;
+        box-shadow: 0 12px 30px rgba(35, 55, 90, 0.18);
+        font-size: 11px;
         text-align: center;
         opacity: 0;
-        transition: opacity 0.2s;
         pointer-events: none;
-        z-index: 100;
+        transform: translateY(7px);
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
       }
       .toast.show {
         opacity: 1;
+        transform: translateY(0);
       }
       .toast.success {
-        background: #2e7d32;
+        background: #e5f7f1;
+        color: #176e5b;
+        border-color: #cceee4;
       }
       .toast.error {
-        background: #c62828;
+        background: #fff0f2;
+        color: #a83249;
+        border-color: #f7d4da;
       }
       .hidden {
         display: none !important;
       }
+
+      @media (max-width: 360px) {
+        body {
+          width: 340px;
+        }
+        .app-shell {
+          padding: 13px 11px 16px;
+        }
+        .timer {
+          font-size: 42px;
+        }
+      }
     </style>
   </head>
   <body>
-    <div class="header">
-      <h1>⏱️ Productivity</h1>
-      <span class="mode-pill" id="mode-pill">⚙️ Custom</span>
-    </div>
-
-    <div class="level-banner level-light" id="level-banner">
-      Análisis: Ligero
-    </div>
-
-    <!-- POMODORO -->
-    <div class="section">
-      <div class="section-title">
-        <span>🍅 Pomodoro / Sesión</span>
-        <span class="badge" id="session-badge" style="display: none"
-          >Activa</span
-        >
-      </div>
-      <div class="timer" id="timer-display">--:--</div>
-      <div class="status-line" id="session-status">Sin sesión activa</div>
-      <div class="streak-bar hidden" id="streak-bar"></div>
-      <div class="ai-tip hidden" id="ai-tip"></div>
-      <div class="mode-selector" id="mode-selector"></div>
-      <div class="row" style="margin-bottom: 6px">
-        <div>
-          <label class="field">Sesión (min)</label
-          ><input
-            type="number"
-            id="pomo-session"
-            value="25"
-            min="1"
-            max="240"
-          />
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">◷</div>
+          <div>
+            <div class="brand-name">TimeWarden</div>
+            <div class="brand-caption">Tu espacio de concentración</div>
+          </div>
         </div>
-        <div>
-          <label class="field">Descanso (min)</label
-          ><input type="number" id="pomo-break" value="5" min="1" max="120" />
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-primary" id="start-session-btn">▶ Iniciar</button>
-        <button class="btn-secondary" id="pomodoro-btn">🍅 Pomodoro</button>
-      </div>
-      <button
-        class="btn-ghost btn-block hidden"
-        id="stop-session-btn"
-        style="margin-top: 6px"
-      >
-        ⏹ Detener sesión
-      </button>
-    </div>
+        <span class="mode-pill" id="mode-pill">Custom</span>
+      </header>
 
-    <!-- ESTA PÁGINA -->
-    <div class="section">
-      <div class="section-title">
-        <span>🚫 Esta página</span>
-        <span class="page-status status-neutral" id="page-status">—</span>
+      <div class="level-banner level-light" id="level-banner">
+        Análisis: Ligero
       </div>
-      <div class="page-info">
-        <img class="favicon" id="page-favicon" src="" alt="" />
-        <span id="page-title">Cargando…</span>
-        <span class="url" id="page-url">—</span>
-      </div>
-      <div class="btn-row">
-        <button class="btn-danger" id="block-now-btn">🚫 Bloquear ahora</button>
-        <button class="btn-ghost-danger" id="whitelist-btn">
-          ✅ Permitir siempre
+
+      <section class="panel focus-panel">
+        <div class="panel-heading">
+          <span class="panel-title">Sesión de enfoque</span>
+          <span class="badge" id="session-badge" style="display: none"
+            >Activa</span
+          >
+        </div>
+
+        <div class="timer-wrap">
+          <div class="timer-eyebrow">Tiempo restante</div>
+          <div class="timer" id="timer-display">--:--</div>
+          <div class="status-line" id="session-status">Sin sesión activa</div>
+          <div class="streak-bar hidden" id="streak-bar"></div>
+          <div class="ai-tip hidden" id="ai-tip"></div>
+        </div>
+
+        <div class="mode-selector" id="mode-selector"></div>
+
+        <div class="field-grid">
+          <div>
+            <label class="field" for="pomo-session">Enfoque · minutos</label>
+            <input
+              type="number"
+              id="pomo-session"
+              value="25"
+              min="1"
+              max="240"
+            />
+          </div>
+          <div>
+            <label class="field" for="pomo-break">Descanso · minutos</label>
+            <input type="number" id="pomo-break" value="5" min="1" max="120" />
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="btn-primary" id="start-session-btn">
+            ▶ &nbsp;Iniciar sesión
+          </button>
+          <button class="btn-secondary" id="pomodoro-btn">Pomodoro</button>
+        </div>
+        <button class="btn-ghost btn-block hidden" id="stop-session-btn">
+          Detener sesión
         </button>
-      </div>
-      <div class="divider"></div>
-      <label class="field">Añadir a grupo</label>
-      <div class="row" style="margin-bottom: 6px">
-        <input type="text" id="new-group-name" placeholder="Nuevo grupo…" />
-        <button class="btn-primary" id="create-group-with-url-btn">＋</button>
-      </div>
-      <div class="group-list" id="group-list"></div>
-    </div>
+      </section>
 
-    <!-- ANÁLISIS / PAUSA -->
-    <div class="section">
-      <div class="section-title">👁 Análisis</div>
-      <div class="row" style="margin-bottom: 6px">
-        <div>
-          <label class="field">Nivel</label>
-          <select id="level-select">
-            <option value="light">🟢 Ligero</option>
-            <option value="standard">🔵 Estándar</option>
-            <option value="invasive">🟠 Invasivo</option>
-            <option value="total">🔴 Total</option>
-          </select>
+      <section class="panel">
+        <div class="panel-heading">
+          <span class="panel-title">Página actual</span>
+          <span class="page-status status-neutral" id="page-status">—</span>
         </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn-secondary" id="pause-btn">⏸ Pausar 1h</button>
-        <button class="btn-secondary hidden" id="resume-btn">▶ Reanudar</button>
-      </div>
-    </div>
 
-    <!-- ACCIONES -->
-    <div class="section">
-      <div class="section-title">🔗 Acciones</div>
-      <div class="quick-stats">
-        <div class="quick-stat">
-          <div class="num" id="qs-sessions">0</div>
-          <div class="lbl">Sesiones</div>
+        <div class="page-info">
+          <div class="page-heading">
+            <img class="favicon" id="page-favicon" src="" alt="" />
+            <span id="page-title">Cargando…</span>
+          </div>
+          <span class="url" id="page-url">—</span>
         </div>
-        <div class="quick-stat">
-          <div class="num" id="qs-respected">0</div>
-          <div class="lbl">Respetados</div>
-        </div>
-        <div class="quick-stat">
-          <div class="num" id="qs-bypass">0</div>
-          <div class="lbl">Bypass</div>
-        </div>
-      </div>
-      <button
-        class="btn-secondary btn-block"
-        id="dashboard-btn"
-        style="margin-bottom: 6px"
-      >
-        📊 Dashboard
-      </button>
-      <button
-        class="btn-secondary btn-block"
-        id="mydata-btn"
-        style="margin-bottom: 6px"
-      >
-        🗂 Mis datos
-      </button>
-      <button
-        class="btn-secondary btn-block"
-        id="options-btn"
-        style="margin-bottom: 6px"
-      >
-        ⚙️ Configuración
-      </button>
-      <button class="btn-secondary btn-block" id="help-btn">📖 Ayuda</button>
-    </div>
 
-    <div class="toast" id="toast"></div>
+        <div class="button-row">
+          <button class="btn-danger" id="block-now-btn">Bloquear sitio</button>
+          <button class="btn-ghost" id="whitelist-btn">Permitir sitio</button>
+        </div>
+
+        <div class="divider"></div>
+        <label class="field" for="new-group-name"
+          >Añadir este sitio a un grupo</label
+        >
+        <div class="create-group-row">
+          <input
+            type="text"
+            id="new-group-name"
+            placeholder="Nombre del nuevo grupo…"
+          />
+          <button
+            class="btn-primary"
+            id="create-group-with-url-btn"
+            aria-label="Crear grupo"
+          >
+            +
+          </button>
+        </div>
+        <div class="group-list" id="group-list"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <span class="panel-title">Nivel de análisis</span>
+          <span class="panel-kicker">Control de actividad</span>
+        </div>
+        <div class="settings-row">
+          <div>
+            <label class="field" for="level-select">Intensidad</label>
+            <select id="level-select">
+              <option value="light">Ligero</option>
+              <option value="standard">Estándar</option>
+              <option value="invasive">Invasivo</option>
+              <option value="total">Total</option>
+            </select>
+          </div>
+          <div class="button-row" style="margin-top: 0; align-items: end">
+            <button class="btn-secondary" id="pause-btn">Pausar 1 h</button>
+            <button class="btn-primary hidden" id="resume-btn">Reanudar</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <span class="panel-title">Resumen rápido</span>
+          <span class="panel-kicker">Tu actividad</span>
+        </div>
+        <div class="quick-stats">
+          <div class="quick-stat">
+            <div class="num" id="qs-sessions">0</div>
+            <div class="lbl">Sesiones</div>
+          </div>
+          <div class="quick-stat">
+            <div class="num" id="qs-respected">0</div>
+            <div class="lbl">Respetados</div>
+          </div>
+          <div class="quick-stat">
+            <div class="num" id="qs-bypass">0</div>
+            <div class="lbl">Bypass</div>
+          </div>
+        </div>
+        <div class="shortcut-grid">
+          <button class="btn-secondary" id="dashboard-btn">Dashboard</button>
+          <button class="btn-secondary" id="mydata-btn">Mis datos</button>
+          <button class="btn-secondary" id="options-btn">Configuración</button>
+          <button class="btn-secondary" id="help-btn">Ayuda</button>
+        </div>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script src="popup.js"></script>
   </body>
 </html>

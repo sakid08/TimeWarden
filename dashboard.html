@@ -1,25 +1,78 @@
 <!doctype html>
-<html>
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Dashboard - Productivity Manager</title>
+    <title>Dashboard - TimeWarden</title>
     <style>
-      body {
-        font-family: system-ui, Arial;
-        padding: 20px;
-        max-width: 1100px;
-        margin: auto;
-        background: #f5f5f5;
+      :root {
+        --bg-main: #f8fafc;
+        --bg-card: #ffffff;
+        --text-main: #0f172a;
+        --text-muted: #64748b;
+        --primary: #10b981;
+        --border: #e2e8f0;
+        --radius: 16px;
+        --shadow:
+          0 4px 6px -1px rgba(0, 0, 0, 0.04), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
       }
-      h1 {
-        color: #333;
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
+        line-height: 1.5;
+      }
+      .topbar {
+        background: #0f172a;
+        color: white;
+        padding: 18px 32px;
+        margin-bottom: 28px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      }
+      .topbar-inner {
+        max-width: 1140px;
+        margin: auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .topbar h1 {
+        font-size: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .container {
+        max-width: 1140px;
+        margin: auto;
+        padding: 0 24px 40px;
       }
       .card {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        background: var(--bg-card);
+        padding: 24px;
+        border-radius: var(--radius);
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+      }
+      .card h2 {
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+        font-weight: 700;
       }
       .grid {
         display: grid;
@@ -27,117 +80,161 @@
         gap: 16px;
       }
       .stat {
-        background: #f9f9f9;
+        background: #f8fafc;
         padding: 20px;
         border-radius: 12px;
-        text-align: center;
+        border: 1px solid var(--border);
+        border-left: 4px solid var(--primary);
       }
       .stat-num {
-        font-size: 36px;
-        font-weight: bold;
-        color: #4caf50;
+        font-size: 32px;
+        font-weight: 800;
+        color: var(--text-main);
+        font-variant-numeric: tabular-nums;
       }
       .stat-lbl {
-        color: #666;
-        font-size: 13px;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
         margin-top: 4px;
+      }
+      .two-col {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr;
+        gap: 24px;
+      }
+      @media (max-width: 850px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
       }
       .bar-chart {
         display: flex;
         align-items: flex-end;
-        gap: 8px;
-        height: 200px;
-        padding: 10px 0;
+        gap: 12px;
+        height: 210px;
+        padding: 24px 8px 28px;
+        background: #f8fafc;
+        border-radius: 12px;
+        border: 1px solid var(--border);
       }
       .bar {
         flex: 1;
-        background: #4caf50;
-        border-radius: 4px 4px 0 0;
-        min-height: 4px;
+        background: linear-gradient(180deg, #10b981 0%, #059669 100%);
+        border-radius: 6px 6px 0 0;
+        min-height: 6px;
         position: relative;
-        transition: opacity 0.2s;
+        transition:
+          opacity 0.2s,
+          transform 0.2s;
       }
       .bar:hover {
-        opacity: 0.7;
+        opacity: 0.85;
+        transform: translateY(-2px);
       }
       .bar-label {
         position: absolute;
-        bottom: -22px;
+        bottom: -24px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 11px;
-        color: #666;
+        color: var(--text-muted);
+        font-weight: 600;
         white-space: nowrap;
       }
       .bar-value {
         position: absolute;
-        top: -20px;
+        top: -22px;
         left: 50%;
         transform: translateX(-50%);
         font-size: 11px;
-        color: #333;
-        font-weight: bold;
+        color: var(--text-main);
+        font-weight: 700;
       }
       .rec {
-        padding: 12px;
-        border-radius: 8px;
-        margin: 8px 0;
+        padding: 14px 16px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        border-left: 4px solid transparent;
       }
       .rec.success {
-        background: #e8f5e9;
+        background: #f0fdf4;
+        border-left-color: #10b981;
+        color: #166534;
       }
       .rec.warning {
-        background: #fff3e0;
+        background: #fffbeb;
+        border-left-color: #f59e0b;
+        color: #92400e;
       }
       .rec.info {
-        background: #e3f2fd;
+        background: #eff6ff;
+        border-left-color: #3b82f6;
+        color: #1e40af;
       }
       .rec.productivity {
-        background: #f3e5f5;
+        background: #faf5ff;
+        border-left-color: #a855f7;
+        color: #6b21a8;
       }
-      .history-item {
-        padding: 8px;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-      }
+
+      .history-item,
       .url-row {
+        padding: 10px 4px;
+        border-bottom: 1px solid var(--border);
         display: flex;
         justify-content: space-between;
-        padding: 6px 0;
-        border-bottom: 1px solid #eee;
+        align-items: center;
         font-size: 13px;
+      }
+      .history-item:last-child,
+      .url-row:last-child {
+        border-bottom: none;
       }
     </style>
   </head>
   <body>
-    <h1>📊 Dashboard de Productividad</h1>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <h1>📊 Dashboard de Productividad</h1>
+        <span style="font-size: 12px; color: #94a3b8"
+          >TimeWarden Analytics</span
+        >
+      </div>
+    </header>
 
-    <div class="card">
-      <h2>Resumen</h2>
-      <div class="grid" id="summary-grid"></div>
-    </div>
+    <main class="container">
+      <div class="card">
+        <h2>Resumen General</h2>
+        <div class="grid" id="summary-grid"></div>
+      </div>
 
-    <div class="card">
-      <h2>📈 Actividad últimos 7 días</h2>
-      <div class="bar-chart" id="weekly-chart"></div>
-    </div>
+      <div class="two-col">
+        <div class="card">
+          <h2>📈 Actividad últimos 7 días</h2>
+          <div class="bar-chart" id="weekly-chart"></div>
+        </div>
 
-    <div class="card">
-      <h2>🤖 Recomendaciones IA</h2>
-      <div id="recs-container"></div>
-    </div>
+        <div class="card">
+          <h2>🤖 Recomendaciones IA</h2>
+          <div id="recs-container"></div>
+        </div>
+      </div>
 
-    <div class="card">
-      <h2>🔗 URLs más visitadas</h2>
-      <div id="urls-container"></div>
-    </div>
+      <div class="two-col">
+        <div class="card">
+          <h2>🔗 URLs más visitadas</h2>
+          <div id="urls-container"></div>
+        </div>
 
-    <div class="card">
-      <h2>📜 Historial reciente</h2>
-      <div id="history-container"></div>
-    </div>
+        <div class="card">
+          <h2>📜 Historial reciente</h2>
+          <div id="history-container"></div>
+        </div>
+      </div>
+    </main>
 
     <script src="dashboard.js"></script>
   </body>
